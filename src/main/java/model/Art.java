@@ -1,17 +1,15 @@
 package model;
 
 public class Art extends Item {
-    private String ten_hoa_si;
-    private int age;
-    public Art(String id, String name, String description, double startingPrice, String ten_hoa_si, int age) {
+    private String artistName; // Thuộc tính riêng: tên họa sĩ/nghệ nhân
+
+    public Art(String id, String name, String description, double startingPrice, String artistName) {
         super(id, name, description, startingPrice);
-        this.ten_hoa_si = ten_hoa_si;
-        this.age = age;
+        this.artistName = artistName;
     }
 
     @Override
     public String printInfo() {
-        return "Art[" + this.id + "] " + this.name + " - Artis: " + this.ten_hoa_si + " - Age: " + this.age + " - Giá khởi điểm: $" +
-                this.startingPrice ;
+        return "Art [" + this.id + "] " + this.name + " by " + this.artistName + " - Giá khởi điểm: $" + this.startingPrice;
     }
 }
