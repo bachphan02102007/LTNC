@@ -53,7 +53,7 @@ public class Auction implements Serializable { // đấu giá
 
         System.out.println("✓ " + tx);// hiện thị thông tin , sau này sẽ học socket và thay thế
     }
-    public synchronized void closeAution() { // công đoạn kết thúc
+    public synchronized void closeAuction() { // công đoạn kết thúc
         if( status == AuctionStatus.RUNNING || status == AuctionStatus.OPEN) {
             status = AuctionStatus.FINISHED;
             if (currentLeader != null) {// nếu tồn tại n đặt thì ->winner
