@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Auction implements Serializable { // đấu giá
@@ -28,6 +29,9 @@ public class Auction implements Serializable { // đấu giá
 
     // ScheduledExecutor: tự động đóng phiên khi hết giờ
     private transient ScheduledExecutorService scheduler;
+
+    // Thay synchronized bằng ReentrantLock cho placeBid
+    private transient ReentrantLock lock = new ReentrantLock();
 
 
     public Auction(String auctionId, Item item, LocalDateTime endTime) {
@@ -66,51 +70,65 @@ public class Auction implements Serializable { // đấu giá
 
     // synchronized = chỉ 1 thread được vào hàm này tại 1 thời điểm
     // → tránh race condition khi 2 người đặt giá cùng lúc (1 điểm đồng thời!)
-    public synchronized void placeBid(Bidder bidder, double amount) throws InvalidBidException, AuctionClosedException {
+    public void placeBid(Bidder bidder, double amount) throws InvalidBidException, AuctionClosedException {
         //kiểm tra lượt đấu giá còn mở không
-        if (status == AuctionStatus.FINISHED || status == AuctionStatus.CANCELED) {
-            throw new AuctionClosedException("Phiên đấu giá #" + auctionId + " đã kết thúc, không thể đặt giá.");
-        }
-        //kiểm tra số tiền đặt vào có hợp lý không nếu ít hơn giá hiện tại sẽ ném ngoại lệ
-        if (amount <= currentHighestBid) {
-            throw new InvalidBidException("Giá đặt của bạn hiên tại là :" + amount + "phải cao hơn giá: " + currentHighestBid);
-        }
-        // Cập nhật trạng thái hoạt động của phiên đấu giá, n
-        if (status == AuctionStatus.OPEN) {
-            status = AuctionStatus.RUNNING;
-        }
-        currentHighestBid = amount; // giá mới se được cập nhật
-        currentLeader = bidder;
+        lock.lock();
+        try {
+            if (status == AuctionStatus.FINISHED || status == AuctionStatus.CANCELED) {
+                throw new AuctionClosedException("Phiên đấu giá #" + auctionId + " đã kết thúc, không thể đặt giá.");
+            }
+            //kiểm tra số tiền đặt vào có hợp lý không nếu ít hơn giá hiện tại sẽ ném ngoại lệ
+            if (amount <= currentHighestBid) {
+                throw new InvalidBidException("Giá đặt của bạn hiên tại là :" + amount + "phải cao hơn giá: " + currentHighestBid);
+            }
+            // Cập nhật trạng thái hoạt động của phiên đấu giá, n
+            if (status == AuctionStatus.OPEN) {
+                status = AuctionStatus.RUNNING;
+            }
+            currentHighestBid = amount; // giá mới se được cập nhật
+            currentLeader = bidder;
 
-        String bidId = "BID-" + System.currentTimeMillis(); // dùng để tạo 1 id riêng cho môi lần đặt giá, duùng time vì mỗi thời điểm giá trị sẽ khác nhau
-        BidTransaction tx = new BidTransaction(bidId, bidder, amount); // tạo 1 đối tượng tham giá phiên với id vừa tạo, ngời tham và số tiền
-        // Notify tất cả observer ngay lập tức
-        notifyBidUpdated(tx);
+            String bidId = "BID-" + System.currentTimeMillis(); // dùng để tạo 1 id riêng cho môi lần đặt giá, duùng time vì mỗi thời điểm giá trị sẽ khác nhau
+            BidTransaction tx = new BidTransaction(bidId, bidder, amount); // tạo 1 đối tượng tham giá phiên với id vừa tạo, ngời tham và số tiền
+            // Notify tất cả observer ngay lập tức
+            notifyBidUpdated(tx);
 
-        System.out.println("✓ " + tx);// hiện thị thông tin , sau này sẽ học socket và thay thế
+            System.out.println("✓ " + tx);// hiện thị thông tin , sau này sẽ học socket và thay thế
+        } finally {
+            lock.unlock();
+        }
     }
-    public synchronized void closeAuction() { // công đoạn kết thúc
-        if( status == AuctionStatus.RUNNING || status == AuctionStatus.OPEN) {
-            status = AuctionStatus.FINISHED;
-            if (currentLeader != null) {// nếu tồn tại n đặt thì ->winner
-                System.out.println("Phiên " + auctionId + ": Người chiến thắng là " + currentLeader.getUsername() + " với giá : " + currentHighestBid );
+    public void closeAuction() { // công đoạn kết thúc
+        lock.lock();
+        try {
+            if (status == AuctionStatus.RUNNING || status == AuctionStatus.OPEN) {
+                status = AuctionStatus.FINISHED;
+                if (currentLeader != null) {// nếu tồn tại n đặt thì ->winner
+                    System.out.println("Phiên " + auctionId + ": Người chiến thắng là " + currentLeader.getUsername() + " với giá : " + currentHighestBid);
+                } else {
+                    System.out.println("Phiên " + auctionId + ": Không có người đấu giá");
+                    status = AuctionStatus.CANCELED;// kh có thì canceled
+                }
+                // thông báo tất cả observer phiên đã đóng
+                notifyAuctionClosed();
+                if (scheduler != null) {
+                    scheduler.shutdownNow();
+                }
             }
-            else {
-                System.out.println("Phiên " + auctionId + ": Không có người đấu giá");
-                status = AuctionStatus.CANCELED;// kh có thì canceled
-            }
-            // thông báo tất cả observer phiên đã đóng
-            notifyAuctionClosed();
-            if (scheduler != null) {
-                scheduler.shutdownNow();
-            }
+        } finally {
+            lock.unlock();
         }
     }
 
     // Anti-sniping: gia hạn thêm giây nếu bid vào phút cuối.
-    public synchronized void extendTime(int seconds) {
-        this.endTime = endTime.plusSeconds(seconds);
-        System.out.println("Phien " + auctionId + " duoc gia han them " + seconds + " giay!");
+    public void extendTime(int seconds) {
+        lock.lock();
+        try {
+            this.endTime = endTime.plusSeconds(seconds);
+            System.out.println("Phien " + auctionId + " duoc gia han them " + seconds + " giay!");
+        } finally {
+            lock.unlock();
+        }
     }
 
     // Notify helpers — private, chỉ gọi từ bên trong
