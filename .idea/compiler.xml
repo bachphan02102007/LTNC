@@ -7,7 +7,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="apppppppp" />
+        <module name="OnlineAuctionSystem" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="apppppppp" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
