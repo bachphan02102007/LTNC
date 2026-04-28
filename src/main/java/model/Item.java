@@ -3,8 +3,8 @@ package model;
 public abstract class Item {
     protected String id;
     protected String name;
-    protected String description; // mô tả
-    protected double startingPrice; //giá khởi điểm;
+    protected String description;
+    protected double startingPrice;
     public Item(String id, String name, String description, double startingPrice) {
         this.id = id;
         this.name = name;

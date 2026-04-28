@@ -8,7 +8,7 @@ public class ItemFactory {
     // static method → gọi trực tiếp ItemFactory.create(...) không cần new
     public static Item create(String type, String id, String name,
                               String description, double startingPrice,
-                              String extraInfo) {
+                              String extraInfo) { // pthuc tạo vật phẩm tự động
         switch (type.toUpperCase()) {
             case "ELECTRONICS":
                 return new Electronics(id, name, description,
