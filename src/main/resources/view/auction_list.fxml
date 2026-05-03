@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
+        <?import javafx.scene.control.*?>
+        <?import javafx.scene.layout.*?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.AuctionListController"
+      spacing="12"
+      style="-fx-padding: 20; -fx-background-color: #f5f6fa;"
+      prefWidth="700" prefHeight="500">
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="Danh sach Phien Dau Gia"
+               style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="+ Tao phien moi" onAction="#handleCreateAuction"
+                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"/>
+    </HBox>
 
-</AnchorPane>
+    <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId"     text="Ma phien"   prefWidth="100"/>
+            <TableColumn fx:id="colItem"   text="San pham"   prefWidth="200"/>
+            <TableColumn fx:id="colPrice"  text="Gia cao nhat" prefWidth="130"/>
+            <TableColumn fx:id="colStatus" text="Trang thai" prefWidth="120"/>
+            <TableColumn fx:id="colEnd"    text="Ket thuc"   prefWidth="150"/>
+        </columns>
+        <placeholder>
+            <Label text="Chua co phien dau gia nao"/>
+        </placeholder>
+    </TableView>
+
+    <Button text="Tham gia Dau Gia" onAction="#handleJoinAuction"
+            style="-fx-pref-width: 200; -fx-background-color: #3498db;
+                   -fx-text-fill: white; -fx-cursor: hand;"/>
+</VBox>
