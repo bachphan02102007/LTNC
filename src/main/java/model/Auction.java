@@ -90,6 +90,8 @@ public class Auction implements Serializable { // đấu giá
 
             String bidId = "BID-" + System.currentTimeMillis(); // dùng để tạo 1 id riêng cho môi lần đặt giá, duùng time vì mỗi thời điểm giá trị sẽ khác nhau
             BidTransaction tx = new BidTransaction(bidId, bidder, amount); // tạo 1 đối tượng tham giá phiên với id vừa tạo, ngời tham và số tiền
+            // lưu lịch sử đạt giá
+            this.bidHistory.add(tx);
             // Notify tất cả observer ngay lập tức
             notifyBidUpdated(tx);
 
