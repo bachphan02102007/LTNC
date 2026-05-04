@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <?import javafx.scene.control.*?>
+        <?import javafx.scene.layout.*?>
+        <?import javafx.scene.text.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.LoginController"
+      alignment="CENTER" spacing="16"
+      style="-fx-padding: 40; -fx-background-color: #f5f6fa;"
+      prefWidth="400" prefHeight="350">
+
+    <Label text="Dau Gia Truc Tuyen"
+           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+    <Label text="Dang nhap tai khoan"
+           style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
+
+    <TextField fx:id="usernameField" promptText="Ten dang nhap"
+               style="-fx-pref-width: 280; -fx-pref-height: 38; -fx-font-size: 14px;"/>
+
+    <PasswordField fx:id="passwordField" promptText="Mat khau"
+                   style="-fx-pref-width: 280; -fx-pref-height: 38; -fx-font-size: 14px;"/>
+
+    <Label fx:id="errorLabel" text=""
+           style="-fx-text-fill: red; -fx-font-size: 12px;"/>
+
+    <Button fx:id="loginButton" text="Dang Nhap"
+            onAction="#handleLogin"
+            style="-fx-pref-width: 280; -fx-pref-height: 38;
+                   -fx-background-color: #3498db; -fx-text-fill: white;
+                   -fx-font-size: 14px; -fx-cursor: hand;"/>
+
+    <Button text="Chua co tai khoan? Dang ky"
+            onAction="#handleGoRegister"
+            style="-fx-background-color: transparent; -fx-text-fill: #3498db;
+                   -fx-cursor: hand; -fx-font-size: 12px;"/>
+</VBox>
