@@ -7,7 +7,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-// D hãy Alt + Enter ở những chỗ model/util bị đỏ để import đúng thư mục của nhóm nhé
 import model.*;
 import util.Singleton.AuctionManager;
 import util.Factory.ItemFactory;
@@ -27,17 +26,21 @@ public class AuctionListController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Gắn từng cột với thuộc tính tương ứng trong class Auction
         colId.setCellValueFactory(new PropertyValueFactory<>("auctionId"));
         colPrice.setCellValueFactory(new PropertyValueFactory<>("currentHighestBid"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
+        // Cột tên sản phẩm và thời gian cần xử lý thủ công
         colItem.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(
                         data.getValue().getItem().getName()));
+
         colEnd.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(
                         data.getValue().getEndTime().toString()));
 
+        // Load dữ liệu giả để test giao diện
         loadSampleData();
         loadTable();
     }
@@ -64,6 +67,7 @@ public class AuctionListController implements Initializable {
 
     @FXML
     private void handleCreateAuction() {
+        // mở form tạo phiên mới
         System.out.println("TODO: Mo form tao phien dau gia moi");
     }
 
@@ -74,6 +78,7 @@ public class AuctionListController implements Initializable {
             System.out.println("Chua chon phien nao!");
             return;
         }
+        // TODO tuần 10: chuyển sang màn hình đấu giá realtime
         System.out.println("TODO: Chuyen sang man hinh dau gia: " + selected.getAuctionId());
     }
 }
