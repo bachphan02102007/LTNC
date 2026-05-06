@@ -78,7 +78,7 @@ public class AuctionListController implements Initializable {
             System.out.println("Chua chon phien nao!");
             return;
         }
-        // TODO tuần 10: chuyển sang màn hình đấu giá realtime
+        //chuyển sang màn hình đấu giá realtime
         System.out.println("TODO: Chuyen sang man hinh dau gia: " + selected.getAuctionId());
     }
 }
