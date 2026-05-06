@@ -15,7 +15,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
-public class AuctionListController implements Initializable {
+public class  AuctionListController implements Initializable {
 
     @FXML private TableView<Auction> auctionTable;
     @FXML private TableColumn<Auction, String> colId;
@@ -67,7 +67,9 @@ public class AuctionListController implements Initializable {
 
     @FXML
     private void handleCreateAuction() {
-        // mở form tạo phiên mới
+
+        // TODO tuần 8: mở form tạo phiên mới
+
         System.out.println("TODO: Mo form tao phien dau gia moi");
     }
 
@@ -77,8 +79,7 @@ public class AuctionListController implements Initializable {
         if (selected == null) {
             System.out.println("Chua chon phien nao!");
             return;
-        }
-        //chuyển sang màn hình đấu giá realtime
+        // TODO tuần 10: chuyển sang màn hình đấu giá realtime 
         System.out.println("TODO: Chuyen sang man hinh dau gia: " + selected.getAuctionId());
     }
 }

@@ -7,9 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
+        import javafx.stage.Stage;
 import model.*;
-import util.Singleton.UserManager;
+        import util.Singleton.UserManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
