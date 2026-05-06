@@ -15,7 +15,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
-public class AuctionListController implements Initializable {
+public class  AuctionListController implements Initializable {
 
     @FXML private TableView<Auction> auctionTable;
     @FXML private TableColumn<Auction, String> colId;
