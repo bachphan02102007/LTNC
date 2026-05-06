@@ -67,7 +67,9 @@ public class  AuctionListController implements Initializable {
 
     @FXML
     private void handleCreateAuction() {
+
         // TODO tuần 8: mở form tạo phiên mới
+
         System.out.println("TODO: Mo form tao phien dau gia moi");
     }
 
