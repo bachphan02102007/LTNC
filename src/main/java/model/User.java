@@ -1,6 +1,10 @@
 package model;
 
-public abstract class User implements Serialization {
+import util.DataStorage;
+
+import java.io.Serializable;
+
+public abstract class User implements Serializable {
     protected String id;          // Dùng protected để class con có thể truy cập
     protected String username;
     protected String password;
