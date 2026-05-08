@@ -9,7 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
         import javafx.stage.Stage;
 import model.*;
-        import util.Singleton.UserManager;
+import util.DataStorage;
+import util.Singleton.UserManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -59,6 +60,7 @@ public class RegisterController implements Initializable {
 
         try {
             UserManager.getInstance().addUser(newUser);
+            DataStorage.saveUsers(UserManager.getInstance().getAllUsers());
             successLabel.setText("Dang ky thanh cong! Hay dang nhap.");
         } catch (AuthenticationException e) {
             errorLabel.setText(e.getMessage());
