@@ -1,6 +1,6 @@
 package model;
 
-public abstract class User {
+public abstract class User implements Serialization {
     protected String id;          // Dùng protected để class con có thể truy cập
     protected String username;
     protected String password;

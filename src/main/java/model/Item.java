@@ -1,6 +1,7 @@
 package model;
+import java.io.Serializable;
 
-public abstract class Item {
+public abstract class Item implements Serializable {
     protected String id;
     protected String name;
     protected String description;
