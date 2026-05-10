@@ -7,7 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-        import javafx.stage.Stage;
+import javafx.stage.Stage;
 import model.*;
 import util.DataStorage;
 import util.Singleton.UserManager;
@@ -41,7 +41,6 @@ public class RegisterController implements Initializable {
         String confirm  = confirmField.getText().trim();
         String role     = roleCombo.getValue();
 
-        // Validate
         if (username.isEmpty() || password.isEmpty()) {
             errorLabel.setText("Vui long nhap day du thong tin!"); return;
         }
@@ -52,7 +51,6 @@ public class RegisterController implements Initializable {
             errorLabel.setText("Ten dang nhap phai co it nhat 3 ky tu!"); return;
         }
 
-        // Tạo user mới
         String id = UUID.randomUUID().toString().substring(0, 8);
         User newUser = role.equals("Seller")
                 ? new Seller(id, username, password)
@@ -61,7 +59,8 @@ public class RegisterController implements Initializable {
         try {
             UserManager.getInstance().addUser(newUser);
             DataStorage.saveUsers(UserManager.getInstance().getAllUsers());
-            successLabel.setText("Dang ky thanh cong! Hay dang nhap.");
+            successLabel.setText("Dang ky thanh cong! Dang chuyen ve dang nhap...");
+
         } catch (AuthenticationException e) {
             errorLabel.setText(e.getMessage());
         }
@@ -74,6 +73,7 @@ public class RegisterController implements Initializable {
                     getClass().getResource("/view/login.fxml"));
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(loader.load(), 400, 350));
+            stage.setTitle("Dang nhap");
         } catch (Exception e) {
             errorLabel.setText("Loi: " + e.getMessage());
         }
