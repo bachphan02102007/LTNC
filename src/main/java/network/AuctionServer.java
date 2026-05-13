@@ -43,16 +43,22 @@ public class AuctionServer {
 
         ExecutorService pool = Executors.newFixedThreadPool(20);
 
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server san sang nhan ket noi!");
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) { //"Mở một cánh cửa để client kết nối vào, sau khi mở nó sẽ ngồi chờ"
+            System.out.println("Server san sang nhan ket noi!");// nó là 1 class có sẵn trong java có chức năng lắng nghe
 
             while (true) {
+                // nódđợi 1 client kết nối tới , đây là đường dây liên lạc giữa client và server.
+                //mỗi lần có client nó sẽ tạo ra 1 socket mới và chỉ phục vụ cho client đó.
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client moi ket noi: " + clientSocket.getInetAddress());
 
-                ClientHandler handler = new ClientHandler(clientSocket);
-                connectedClients.add(handler);
-                pool.execute(handler);
+
+                // và sau khi tạo xong socket cho client đó thì sẽ taoj ra 1 clientHandler riêng để dữ nó
+                //handler A dữ socket A
+
+                ClientHandler handler = new ClientHandler(clientSocket); // clientsocket được truyền vào để handler biết thằng nào để xử lý
+                connectedClients.add(handler); // mục đích biết ai đang kết nối để gửi thông báo hoặc broadcast
+                pool.execute(handler); // đa luồng thực hiện cac clientHandler
             }
         }
     }

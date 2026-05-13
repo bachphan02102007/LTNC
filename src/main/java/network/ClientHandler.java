@@ -85,12 +85,31 @@ public class ClientHandler implements Runnable {
             );
 
         } else if (message.equals("LIST")) {
-            String list = AuctionManager.getInstance().getAllAuctions().stream()
-                    .map(a -> a.getAuctionId() + "|" + a.getItem().getName()
-                            + "|" + a.getCurrentHighestBid() + "|" + a.getStatus())
-                    .collect(Collectors.joining(","));
-            out.println("LIST_OK:" + (list.isEmpty() ? "Chua co phien nao" : list));
 
+            System.out.println("=== SERVER DEBUG ===");
+
+            for (Auction a : AuctionManager.getInstance().getAllAuctions()) {
+                System.out.println(
+                        a.getAuctionId()
+                                + " | "
+                                + a.getItem().getName()
+                                + " | "
+                                + a.getStatus()
+                );
+            }
+
+            String list = AuctionManager.getInstance()
+                    .getRunningAuctions()
+                    .stream()
+                    .map(a -> a.getAuctionId() + "|"
+                            + a.getItem().getName() + "|"
+                            + a.getCurrentHighestBid())
+                    .collect(Collectors.joining(","));
+
+            System.out.println("LIST GUI VE CLIENT = " + list);
+
+            out.println("LIST_OK:" +
+                    (list.isEmpty() ? "Chua co phien nao" : list));
         } else if (message.startsWith("ADD_ITEM:")) {
             handleAddItem(message);
 

@@ -120,4 +120,22 @@ public class SellerController implements Initializable {
         fieldDuration.clear();
         comboCategory.setValue("Electronics");
     }
+    @FXML
+    private void handleLogout(javafx.event.ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/view/login.fxml"));
+
+            Stage stage = (Stage) buttonPost.getScene().getWindow();
+
+            Scene scene = new Scene(loader.load());
+
+            stage.setScene(scene);
+            stage.setTitle("Đăng nhập");
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

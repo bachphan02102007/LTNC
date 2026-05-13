@@ -1,38 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.RegisterController"
-      alignment="CENTER" spacing="14"
-      style="-fx-padding: 40; -fx-background-color: #f5f6fa;"
-      prefWidth="400" prefHeight="420">
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="controller.RegisterController"
+           prefWidth="1000"
+           prefHeight="700"
+           style="-fx-background-color: linear-gradient(to bottom right, #e0f2fe, #ffffff);">
 
-    <Label text="Dang Ky Tai Khoan"
-           style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Pane>
+        <Circle radius="190" layoutX="130" layoutY="120" fill="#38bdf855"/>
+        <Circle radius="230" layoutX="820" layoutY="560" fill="#2563eb33"/>
+        <Circle radius="95" layoutX="760" layoutY="120" fill="#bae6fd"/>
+    </Pane>
 
-    <TextField fx:id="usernameField" promptText="Ten dang nhap"
-               style="-fx-pref-width: 280; -fx-pref-height: 38;"/>
+    <HBox alignment="CENTER"
+          maxWidth="820"
+          maxHeight="540"
+          style="-fx-background-color: white;
+                 -fx-background-radius: 34;
+                 -fx-border-radius: 34;
+                 -fx-border-color: #dbeafe;
+                 -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.20), 35, 0, 0, 12);">
 
-    <PasswordField fx:id="passwordField" promptText="Mat khau"
-                   style="-fx-pref-width: 280; -fx-pref-height: 38;"/>
+        <VBox spacing="20" alignment="CENTER_LEFT" prefWidth="380" style="-fx-padding: 45;">
+            <Label text="JOIN AUCTION"
+                   style="-fx-text-fill: #0284c7; -fx-font-size: 13px; -fx-font-weight: bold;"/>
 
-    <PasswordField fx:id="confirmField" promptText="Xac nhan mat khau"
-                   style="-fx-pref-width: 280; -fx-pref-height: 38;"/>
+            <Label text="Tạo Tài Khoản&#10;Đấu Giá"
+                   style="-fx-text-fill: #0f172a; -fx-font-size: 40px; -fx-font-weight: bold;"/>
 
-    <ComboBox fx:id="roleCombo" promptText="Chon vai tro"
-              style="-fx-pref-width: 280; -fx-pref-height: 38;"/>
+            <Label text="Đăng ký tài khoản để tham gia đấu giá, đặt giá và quản lý các phiên dễ dàng hơn."
+                   wrapText="true"
+                   style="-fx-text-fill: #475569; -fx-font-size: 14px; -fx-line-spacing: 4;"/>
+        </VBox>
 
-    <Label fx:id="errorLabel" text=""
-           style="-fx-text-fill: red; -fx-font-size: 12px;"/>
+        <VBox alignment="CENTER"
+              spacing="13"
+              prefWidth="410"
+              style="-fx-background-color: #f8fbff; -fx-background-radius: 34; -fx-padding: 38;">
 
-    <Label fx:id="successLabel" text=""
-           style="-fx-text-fill: green; -fx-font-size: 12px;"/>
+            <Label text="Đăng ký"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
 
-    <Button text="Dang Ky" onAction="#handleRegister"
-            style="-fx-pref-width: 280; -fx-pref-height: 38;
-                   -fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"/>
+            <TextField fx:id="usernameField" promptText="Tên đăng nhập"
+                       style="-fx-pref-width: 300; -fx-pref-height: 44; -fx-background-color: white;
+                              -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #bfdbfe;
+                              -fx-padding: 0 14;"/>
 
-    <Button text="Da co tai khoan? Dang nhap" onAction="#handleGoLogin"
-            style="-fx-background-color: transparent; -fx-text-fill: #3498db; -fx-cursor: hand;"/>
-</VBox>
+            <PasswordField fx:id="passwordField" promptText="Mật khẩu"
+                           style="-fx-pref-width: 300; -fx-pref-height: 44; -fx-background-color: white;
+                                  -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #bfdbfe;
+                                  -fx-padding: 0 14;"/>
+
+            <PasswordField fx:id="confirmField" promptText="Xác nhận mật khẩu"
+                           style="-fx-pref-width: 300; -fx-pref-height: 44; -fx-background-color: white;
+                                  -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #bfdbfe;
+                                  -fx-padding: 0 14;"/>
+
+            <ComboBox fx:id="roleCombo"
+                      promptText="Chọn vai trò"
+                      style="-fx-pref-width: 300; -fx-pref-height: 44; -fx-background-color: white;
+                             -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #bfdbfe;"/>
+
+            <Label fx:id="errorLabel" text="" wrapText="true" style="-fx-text-fill: #ef4444; -fx-font-size: 12px;"/>
+            <Label fx:id="successLabel" text="" wrapText="true" style="-fx-text-fill: #0284c7; -fx-font-size: 12px;"/>
+
+            <Button text="Đăng Ký"
+                    onAction="#handleRegister"
+                    style="-fx-pref-width: 300; -fx-pref-height: 48;
+                           -fx-background-color: linear-gradient(to right, #38bdf8, #2563eb);
+                           -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;
+                           -fx-background-radius: 18; -fx-cursor: hand;"/>
+
+            <Button text="Đăng nhập"
+                    onAction="#handleGoLogin"
+                    style="-fx-background-color: transparent; -fx-text-fill: #0284c7;
+                           -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand;"/>
+        </VBox>
+    </HBox>
+</StackPane>

@@ -46,4 +46,7 @@ public class AuctionManager { // người quản lý đấu giá
                 .filter(a -> a.getStatus().name().equals("RUNNING"))
                 .collect(java.util.stream.Collectors.toList());
     }
+    public void clearAuctions() {
+        auctions.clear();
+    }
 }

@@ -383,7 +383,7 @@ public class AuctionRoomController implements Initializable {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/view/auction_list.fxml"));
             Stage stage = (Stage) buttonBid.getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 700, 500));
+            stage.setScene(new Scene(loader.load()));
             stage.setTitle("Danh sach Phien Dau Gia");
         } catch (IOException e) {
             addLog("Lỗi quay lại: " + e.getMessage());

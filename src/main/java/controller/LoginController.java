@@ -1,4 +1,11 @@
 package controller;
+//Vai trò của UserManager
+//UserManager là nơi quản lý toàn bộ danh sách user trong hệ thống.
+//Nó cho phép:
+//Thêm user mới (addUser).
+//Xác thực đăng nhập (authenticate).
+//Lấy danh sách tất cả user (getAllUsers).
+// Nó giống như một “cơ sở dữ liệu trong bộ nhớ” cho toàn bộ người dùng.
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -36,10 +43,20 @@ public class LoginController {
                             try {
                                 Stage stage = (Stage) usernameField.getScene().getWindow();
                                 if (user instanceof Seller) {
-                                    // Seller → seller dashboard
                                     goSeller(stage, (Seller) user);
                                 } else {
-                                    // Bidder / Admin → danh sách phiên
+                                    // Bidder/Admin phải connect socket trước khi vào AuctionList
+                                    try {
+                                        SessionManager.getInstance()
+                                                .getSocketClient()
+                                                .connect(user.getUsername(), msg -> {
+                                                    System.out.println("[Bidder socket] " + msg);
+                                                });
+                                    } catch (Exception e) {
+                                        errorLabel.setText("Không thể kết nối server: " + e.getMessage());
+                                        return;
+                                    }
+
                                     goAuctionList(stage);
                                 }
                             } catch (Exception e) {
@@ -53,7 +70,7 @@ public class LoginController {
     private void goAuctionList(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/view/auction_list.fxml"));
-        stage.setScene(new Scene(loader.load(), 700, 500));
+        stage.setScene(new Scene(loader.load()));
         stage.setTitle("Danh sach Phien Dau Gia");
         stage.show();
     }
@@ -61,7 +78,7 @@ public class LoginController {
     private void goSeller(Stage stage, Seller seller) throws Exception {
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/view/seller_dashboard.fxml"));
-        stage.setScene(new Scene(loader.load(), 800, 600));
+        stage.setScene(new Scene(loader.load()));
         stage.setTitle("Quan ly San pham - Seller");
 
         SellerController ctrl = loader.getController();
@@ -76,7 +93,7 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/view/register.fxml"));
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 400, 420));
+            stage.setScene(new Scene(loader.load()));
             stage.setTitle("Dang ky tai khoan");
         } catch (Exception e) {
             errorLabel.setText("Loi: " + e.getMessage());

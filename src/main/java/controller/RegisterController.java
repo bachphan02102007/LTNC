@@ -27,7 +27,7 @@ public class RegisterController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        roleCombo.setItems(FXCollections.observableArrayList("Bidder", "Seller"));
+        roleCombo.setItems(FXCollections.observableArrayList("Bidder", "Seller","Admin"));
         roleCombo.getSelectionModel().selectFirst();
     }
 
@@ -59,7 +59,7 @@ public class RegisterController implements Initializable {
         try {
             UserManager.getInstance().addUser(newUser);
             DataStorage.saveUsers(UserManager.getInstance().getAllUsers());
-            successLabel.setText("Dang ky thanh cong! Dang chuyen ve dang nhap...");
+            successLabel.setText("Dang ky thanh cong!");
 
         } catch (AuthenticationException e) {
             errorLabel.setText(e.getMessage());
@@ -72,7 +72,7 @@ public class RegisterController implements Initializable {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/view/login.fxml"));
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 400, 350));
+            stage.setScene(new Scene(loader.load()));
             stage.setTitle("Dang nhap");
         } catch (Exception e) {
             errorLabel.setText("Loi: " + e.getMessage());

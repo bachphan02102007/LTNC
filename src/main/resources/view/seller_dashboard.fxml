@@ -1,90 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controller.SellerController"
-            style="-fx-background-color: #f4f6f9;">
+            prefWidth="1000"
+            prefHeight="700"
+            style="-fx-background-color: linear-gradient(to bottom right, #eff6ff, #ffffff);">
 
-    <!-- TOP BAR -->
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="12"
-              style="-fx-background-color: #1a1a2e; -fx-padding: 14 24;">
-            <Label text="🏷 Quản lý sản phẩm"
-                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <HBox alignment="CENTER_LEFT"
+              spacing="16"
+              style="-fx-background-color: white;
+                     -fx-padding: 22 28;
+                     -fx-border-color: #dbeafe;
+                     -fx-border-width: 0 0 1 0;">
+
+            <VBox>
+                <Label text="Seller Dashboard"
+                       style="-fx-text-fill: #0284c7; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                <Label text="Quản lý sản phẩm đấu giá"
+                       style="-fx-text-fill: #0f172a; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label text="B"
+                   style="-fx-background-color: linear-gradient(to bottom right, #38bdf8, #2563eb);
+                          -fx-text-fill: white;
+                          -fx-font-size: 17px;
+                          -fx-font-weight: bold;
+                          -fx-alignment: center;
+                          -fx-min-width: 42;
+                          -fx-min-height: 42;
+                          -fx-background-radius: 999;"/>
+
+            <MenuButton text="▼"
+                        style="-fx-background-color: white;
+                               -fx-text-fill: #0284c7;
+                               -fx-font-size: 15px;
+                               -fx-font-weight: bold;
+                               -fx-padding: 8 14;
+                               -fx-background-radius: 16;
+                               -fx-border-radius: 16;
+                               -fx-border-color: #bfdbfe;
+                               -fx-cursor: hand;">
+
+                <items>
+                    <MenuItem text="Hồ sơ tài khoản"/>
+                    <MenuItem text="Ví đấu giá"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Đăng xuất"
+                              onAction="#handleLogout"/>
+                </items>
+            </MenuButton>
         </HBox>
     </top>
 
-    <!-- CENTER: form bên trái | danh sách bên phải -->
     <center>
-        <HBox spacing="16" style="-fx-padding: 20;">
+        <HBox spacing="24" style="-fx-padding: 30;">
 
-            <!-- FORM đăng sản phẩm -->
-            <VBox spacing="14" minWidth="280" maxWidth="300"
-                  style="-fx-background-color: white; -fx-padding: 20;
-                         -fx-border-radius: 10; -fx-background-radius: 10;
-                         -fx-border-color: #e0e0e0; -fx-border-width: 1;">
+            <VBox spacing="16"
+                  minWidth="320"
+                  maxWidth="340"
+                  style="-fx-background-color: white; -fx-padding: 26;
+                         -fx-background-radius: 28; -fx-border-radius: 28;
+                         -fx-border-color: #dbeafe;
+                         -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.16), 18, 0, 0, 8);">
 
-                <Label text="📦 Đăng sản phẩm mới"
-                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
-                <Separator/>
+                <Label text="Đăng sản phẩm mới"
+                       style="-fx-font-size: 21px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
 
-                <VBox spacing="4">
-                    <Label text="Tên sản phẩm *" style="-fx-font-size: 12px; -fx-text-fill: #555;"/>
-                    <TextField fx:id="fieldItemName" promptText="VD: iPhone 15 Pro Max"
-                               style="-fx-padding: 8; -fx-border-radius: 6;
-                                      -fx-background-radius: 6; -fx-border-color: #ccc;"/>
-                </VBox>
+                <TextField fx:id="fieldItemName"
+                           promptText="Tên sản phẩm"
+                           style="-fx-pref-height: 46; -fx-background-color: #f8fbff;
+                                  -fx-background-radius: 16; -fx-border-radius: 16;
+                                  -fx-border-color: #bfdbfe; -fx-padding: 0 14;"/>
 
-                <VBox spacing="4">
-                    <Label text="Giá khởi điểm (VNĐ) *" style="-fx-font-size: 12px; -fx-text-fill: #555;"/>
-                    <TextField fx:id="fieldStartPrice" promptText="VD: 5000000"
-                               style="-fx-padding: 8; -fx-border-radius: 6;
-                                      -fx-background-radius: 6; -fx-border-color: #ccc;"/>
-                </VBox>
+                <TextField fx:id="fieldStartPrice"
+                           promptText="Giá khởi điểm VNĐ"
+                           style="-fx-pref-height: 46; -fx-background-color: #f8fbff;
+                                  -fx-background-radius: 16; -fx-border-radius: 16;
+                                  -fx-border-color: #bfdbfe; -fx-padding: 0 14;"/>
 
-                <VBox spacing="4">
-                    <Label text="Thời gian đấu giá (giây) *" style="-fx-font-size: 12px; -fx-text-fill: #555;"/>
-                    <TextField fx:id="fieldDuration" promptText="VD: 120"
-                               style="-fx-padding: 8; -fx-border-radius: 6;
-                                      -fx-background-radius: 6; -fx-border-color: #ccc;"/>
-                </VBox>
+                <TextField fx:id="fieldDuration"
+                           promptText="Thời gian đấu giá giây"
+                           style="-fx-pref-height: 46; -fx-background-color: #f8fbff;
+                                  -fx-background-radius: 16; -fx-border-radius: 16;
+                                  -fx-border-color: #bfdbfe; -fx-padding: 0 14;"/>
 
-                <VBox spacing="4">
-                    <Label text="Danh mục *" style="-fx-font-size: 12px; -fx-text-fill: #555;"/>
-                    <ComboBox fx:id="comboCategory" maxWidth="Infinity"/>
-                </VBox>
+                <ComboBox fx:id="comboCategory"
+                          maxWidth="Infinity"
+                          promptText="Danh mục"
+                          style="-fx-pref-height: 46; -fx-background-color: #f8fbff;
+                                 -fx-background-radius: 16; -fx-border-radius: 16;
+                                 -fx-border-color: #bfdbfe;"/>
 
-                <Separator/>
+                <Button fx:id="buttonPost"
+                        text="Đăng sản phẩm"
+                        onAction="#handlePostItem"
+                        maxWidth="Infinity"
+                        style="-fx-background-color: linear-gradient(to right, #38bdf8, #2563eb);
+                               -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;
+                               -fx-padding: 13; -fx-background-radius: 18; -fx-cursor: hand;"/>
 
-                <Button fx:id="buttonPost" text="🚀 Đăng sản phẩm"
-                        onAction="#handlePostItem" maxWidth="Infinity"
-                        style="-fx-background-color: #e05c00; -fx-text-fill: white;
-                               -fx-font-size: 14px; -fx-font-weight: bold;
-                               -fx-padding: 10; -fx-background-radius: 8; -fx-cursor: hand;"/>
-
-                <Label fx:id="labelResult" text="" wrapText="true"
-                       style="-fx-font-size: 12px; -fx-text-fill: gray;"/>
+                <Label fx:id="labelResult"
+                       text=""
+                       wrapText="true"
+                       style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
             </VBox>
 
-            <!-- DANH SÁCH sản phẩm đã đăng -->
-            <VBox spacing="10" HBox.hgrow="ALWAYS">
-                <Label text="📋 Sản phẩm đã đăng"
-                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <VBox spacing="16" HBox.hgrow="ALWAYS">
+                <Label text="Sản phẩm đã đăng"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
 
-                <ListView fx:id="listViewMyItems" VBox.vgrow="ALWAYS"
-                          style="-fx-background-radius: 8; -fx-border-radius: 8;
-                                 -fx-border-color: #e0e0e0; -fx-font-size: 13px;">
+                <ListView fx:id="listViewMyItems"
+                          VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 24;
+                                 -fx-border-radius: 24;
+                                 -fx-border-color: #dbeafe;
+                                 -fx-padding: 12;
+                                 -fx-font-size: 14px;">
                     <placeholder>
                         <Label text="Bạn chưa đăng sản phẩm nào."
-                               style="-fx-text-fill: #aaa;"/>
+                               style="-fx-text-fill: #94a3b8;"/>
                     </placeholder>
                 </ListView>
             </VBox>
 
         </HBox>
     </center>
-
 </BorderPane>

@@ -1,37 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
-        <?import javafx.scene.control.*?>
-        <?import javafx.scene.layout.*?>
-        <?import javafx.scene.text.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.LoginController"
-      alignment="CENTER" spacing="16"
-      style="-fx-padding: 40; -fx-background-color: #f5f6fa;"
-      prefWidth="400" prefHeight="350">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-    <Label text="Dau Gia Truc Tuyen"
-           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="controller.LoginController"
+           prefWidth="1000"
+           prefHeight="700"
+           style="-fx-background-color: linear-gradient(to bottom right, #e0f2fe, #ffffff);">
 
-    <Label text="Dang nhap tai khoan"
-           style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
+    <Pane>
+        <Circle radius="180" layoutX="120" layoutY="110" fill="#38bdf855"/>
+        <Circle radius="220" layoutX="820" layoutY="520" fill="#2563eb33"/>
+        <Circle radius="90" layoutX="760" layoutY="120" fill="#bae6fd"/>
+    </Pane>
 
-    <TextField fx:id="usernameField" promptText="Ten dang nhap"
-               style="-fx-pref-width: 280; -fx-pref-height: 38; -fx-font-size: 14px;"/>
+    <HBox alignment="CENTER"
+          maxWidth="780"
+          maxHeight="470"
+          style="-fx-background-color: white;
+                 -fx-background-radius: 34;
+                 -fx-border-radius: 34;
+                 -fx-border-color: #dbeafe;
+                 -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.20), 35, 0, 0, 12);">
 
-    <PasswordField fx:id="passwordField" promptText="Mat khau"
-                   style="-fx-pref-width: 280; -fx-pref-height: 38; -fx-font-size: 14px;"/>
+        <VBox spacing="20" alignment="CENTER_LEFT" prefWidth="370" style="-fx-padding: 45;">
+            <Label text="ONLINE AUCTION"
+                   style="-fx-text-fill: #0284c7; -fx-font-size: 13px; -fx-font-weight: bold;"/>
 
-    <Label fx:id="errorLabel" text=""
-           style="-fx-text-fill: red; -fx-font-size: 12px;"/>
+            <Label text="Đấu Giá&#10;Trực Tuyến"
+                   style="-fx-text-fill: #0f172a; -fx-font-size: 42px; -fx-font-weight: bold;"/>
 
-    <Button fx:id="loginButton" text="Dang Nhap"
-            onAction="#handleLogin"
-            style="-fx-pref-width: 280; -fx-pref-height: 38;
-                   -fx-background-color: #3498db; -fx-text-fill: white;
-                   -fx-font-size: 14px; -fx-cursor: hand;"/>
+            <Label text="Tham gia các phiên đấu giá hiện đại, nhanh chóng và chuyên nghiệp."
+                   wrapText="true"
+                   style="-fx-text-fill: #475569; -fx-font-size: 14px; -fx-line-spacing: 4;"/>
+        </VBox>
 
-    <Button text="Chua co tai khoan? Dang ky"
-            onAction="#handleGoRegister"
-            style="-fx-background-color: transparent; -fx-text-fill: #3498db;
-                   -fx-cursor: hand; -fx-font-size: 12px;"/>
-</VBox>
+        <VBox alignment="CENTER"
+              spacing="16"
+              prefWidth="390"
+              style="-fx-background-color: #f8fbff; -fx-background-radius: 34; -fx-padding: 42;">
+
+            <Label text="Đăng nhập"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+
+            <Label text="Chào mừng bạn quay trở lại"
+                   style="-fx-font-size: 14px; -fx-text-fill: #64748b;"/>
+
+            <TextField fx:id="usernameField"
+                       promptText="Tên đăng nhập"
+                       style="-fx-pref-width: 300; -fx-pref-height: 48; -fx-font-size: 14px;
+                              -fx-background-color: white; -fx-background-radius: 16;
+                              -fx-border-radius: 16; -fx-border-color: #bfdbfe; -fx-padding: 0 14;"/>
+
+            <PasswordField fx:id="passwordField"
+                           promptText="Mật khẩu"
+                           style="-fx-pref-width: 300; -fx-pref-height: 48; -fx-font-size: 14px;
+                                  -fx-background-color: white; -fx-background-radius: 16;
+                                  -fx-border-radius: 16; -fx-border-color: #bfdbfe; -fx-padding: 0 14;"/>
+
+            <Label fx:id="errorLabel"
+                   text=""
+                   wrapText="true"
+                   style="-fx-text-fill: #ef4444; -fx-font-size: 12px;"/>
+
+            <Button fx:id="loginButton"
+                    text="Đăng Nhập"
+                    onAction="#handleLogin"
+                    style="-fx-pref-width: 300; -fx-pref-height: 50;
+                           -fx-background-color: linear-gradient(to right, #38bdf8, #2563eb);
+                           -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;
+                           -fx-background-radius: 18; -fx-cursor: hand;"/>
+
+            <Button text="Đăng ký ngay"
+                    onAction="#handleGoRegister"
+                    style="-fx-background-color: transparent; -fx-text-fill: #0284c7;
+                           -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand;"/>
+        </VBox>
+    </HBox>
+</StackPane>

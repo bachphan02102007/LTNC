@@ -1,5 +1,12 @@
 package util;
 
+//Vai trò của SessionManager
+//SessionManager không quản lý tất cả user, mà chỉ giữ user hiện tại đang đăng nhập.
+//Nó lưu:
+//currentUser → đối tượng user đã đăng nhập.
+//socketClient → kết nối mạng realtime gắn với user đó.
+//👉 Nó giống như “thông tin phiên làm việc” của người dùng hiện tại.
+
 import model.User;
 import network.SocketClient;
 
@@ -36,5 +43,8 @@ public class SessionManager {
     }
 
     public User getCurrentUser() { return currentUser; }
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+    }
     public SocketClient getSocketClient() { return socketClient; }
 }

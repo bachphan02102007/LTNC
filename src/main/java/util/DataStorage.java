@@ -43,7 +43,7 @@ public class DataStorage {
         }
     }
 
-    // Helper methods tiện dụng
+    // giúp methods tiện dụng
     public static void saveUsers(List<?> users) {
         saveList(users, USER_FILE);
     }
