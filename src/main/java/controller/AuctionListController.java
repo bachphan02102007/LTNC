@@ -60,8 +60,13 @@ public class AuctionListController implements Initializable {
 
         auctionContainer.getChildren().clear();
 
-        var auctions = AuctionManager.getInstance().getRunningAuctions();        // Không có dữ liệu
-        if (auctions.isEmpty()) {
+        var auctions = AuctionManager.getInstance()
+                .getAllAuctions()
+                .stream()
+                .filter(a -> a.getEndTime()
+                        .plusDays(1)
+                        .isAfter(LocalDateTime.now()))
+                .toList();        if (auctions.isEmpty()) {
 
             labelEmpty.setVisible(true);
 
@@ -146,41 +151,8 @@ public class AuctionListController implements Initializable {
 
             try {
                 if (msg.startsWith("NEW_AUCTION:")) {
-
-                    String[] parts = msg.split(":");
-
-                    String auctionId = parts[1];
-                    String itemName = parts[2];
-                    double startPrice = Double.parseDouble(parts[3]);
-                    String category = parts[4].toUpperCase();
-
-                    String extraInfo = "0";
-                    if (category.equals("ART")) {
-                        extraInfo = "Unknown Artist";
-                    } else if (category.equals("VEHICLE")) {
-                        extraInfo = "Unknown Model";
-                    }
-
-                    Item item = ItemFactory.create(
-                            category,
-                            "ITEM-" + System.currentTimeMillis(),
-                            itemName,
-                            "",
-                            startPrice,
-                            extraInfo
-                    );
-
-                    Auction auction = new Auction(
-                            auctionId,
-                            item,
-                            java.time.LocalDateTime.now().plusHours(1)
-                    );
-
-                    auction.startAuction();
-
-                    AuctionManager.getInstance().addAuction(auction);
-
-                    loadCards();
+                    System.out.println("[AuctionList] Co phien moi -> request LIST");
+                    client.requestList();
                 }
 
                 else if (msg.startsWith("LIST_OK:")) {
@@ -199,14 +171,16 @@ public class AuctionListController implements Initializable {
                     for (String a : auctions) {
                         String[] p = a.split("\\|");
 
-                        if (p.length < 3) continue;
+                        if (p.length < 5) continue;
 
                         String id = p[0];
                         String name = p[1];
                         double price = Double.parseDouble(p[2]);
+                        String category = p[3];
+                        LocalDateTime endTime = LocalDateTime.parse(p[4]);
 
                         Item item = ItemFactory.create(
-                                "ELECTRONICS",
+                                category.toUpperCase(),
                                 "ITEM-" + System.nanoTime(),
                                 name,
                                 "",
@@ -214,13 +188,11 @@ public class AuctionListController implements Initializable {
                                 "0"
                         );
 
-                        Auction auction = new Auction(
-                                id,
-                                item,
-                                java.time.LocalDateTime.now().plusHours(1)
-                        );
+                        Auction auction = new Auction(id, item, endTime);
 
-                        auction.startAuction();
+                        if (endTime.isAfter(LocalDateTime.now())) {
+                            auction.startAuction();
+                        }
 
                         AuctionManager.getInstance().addAuction(auction);
                     }
@@ -237,7 +209,6 @@ public class AuctionListController implements Initializable {
             }
         });
     }
-
 
 
 

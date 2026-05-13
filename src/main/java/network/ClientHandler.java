@@ -86,27 +86,17 @@ public class ClientHandler implements Runnable {
 
         } else if (message.equals("LIST")) {
 
-            System.out.println("=== SERVER DEBUG ===");
-
-            for (Auction a : AuctionManager.getInstance().getAllAuctions()) {
-                System.out.println(
-                        a.getAuctionId()
-                                + " | "
-                                + a.getItem().getName()
-                                + " | "
-                                + a.getStatus()
-                );
-            }
-
             String list = AuctionManager.getInstance()
-                    .getRunningAuctions()
+                    .getAllAuctions()
                     .stream()
+                    .filter(a -> a.getEndTime().plusDays(1).isAfter(LocalDateTime.now()))
                     .map(a -> a.getAuctionId() + "|"
                             + a.getItem().getName() + "|"
-                            + a.getCurrentHighestBid())
+                            + a.getCurrentHighestBid() + "|"
+                            + a.getItem().getClass().getSimpleName().toUpperCase() + "|"
+                            + a.getEndTime() + "|"
+                            + a.getStatus())
                     .collect(Collectors.joining(","));
-
-            System.out.println("LIST GUI VE CLIENT = " + list);
 
             out.println("LIST_OK:" +
                     (list.isEmpty() ? "Chua co phien nao" : list));
@@ -160,7 +150,7 @@ public class ClientHandler implements Runnable {
 
         out.println("ADD_ITEM_OK:" + auctionId);
         AuctionServer.broadcastAll("NEW_AUCTION:" + auctionId + ":"
-                + name + ":" + startPrice + ":" + category);
+                + name + ":" + startPrice + ":" + category + ":" + endTime);
 
         System.out.println("[Server] Phien moi: " + auctionId
                 + " | " + name + " | " + startPrice + " | " + duration + "s");

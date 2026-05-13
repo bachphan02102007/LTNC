@@ -49,4 +49,11 @@ public class AuctionManager { // người quản lý đấu giá
     public void clearAuctions() {
         auctions.clear();
     }
+    public List<Auction> getVisibleAuctions() {
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+
+        return auctions.stream()
+                .filter(a -> a.getEndTime().plusDays(1).isAfter(now))
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

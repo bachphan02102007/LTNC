@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import model.Auction;
 import model.BidTransaction;
+import model.Bidder;
 import model.User;
 import network.SocketClient;
 import util.SessionManager;
@@ -228,20 +229,27 @@ public class AuctionRoomController implements Initializable {
         if (parts.length < 4) return;
         if (!parts[1].equals(currentAuctionId)) return;
 
-        double amount  = Double.parseDouble(parts[2]);
-        String bidder  = parts[3];
+        double amount = Double.parseDouble(parts[2]);
+        String bidderName = parts[3];
 
         labelCurrentBid.setText(String.format("%,.0f VNĐ", amount));
         labelCurrentBid.setTextFill(Color.ORANGERED);
-        labelLeader.setText("👑 Người dẫn đầu: " + bidder);
+        labelLeader.setText("👑 Người dẫn đầu: " + bidderName);
 
-        // Reload lịch sử bid từ AuctionManager
-        if (currentAuction != null) {
-            bidHistory.setAll(currentAuction.getBidHistory());
-            labelBidCount.setText(String.valueOf(bidHistory.size()));
-        }
+        // Tạo transaction local để hiển thị lên bảng lịch sử
+        Bidder bidder = new Bidder("", bidderName, "");
+        BidTransaction tx = new BidTransaction(
+                "BID-" + System.currentTimeMillis(),
+                bidder,
+                amount
+        );
 
-        addLog("🔔 " + bidder + " vừa đặt " + String.format("%,.0f VNĐ", amount));
+        bidHistory.add(0, tx);
+        labelBidCount.setText(String.valueOf(bidHistory.size()));
+
+        tableBidHistory.refresh();
+
+        addLog("🔔 " + bidderName + " vừa đặt " + String.format("%,.0f VNĐ", amount));
     }
 
     /** BID_OK:amount */

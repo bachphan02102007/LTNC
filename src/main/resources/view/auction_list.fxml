@@ -5,8 +5,8 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="controller.AuctionListController"
-            prefWidth="1000"
-            prefHeight="700"
+            prefWidth="1300"
+            prefHeight="770"
             style="-fx-background-color: linear-gradient(to bottom right, #eff6ff, #ffffff);">
 
     <top>

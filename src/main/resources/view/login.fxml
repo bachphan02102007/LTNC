@@ -6,8 +6,8 @@
 
 <StackPane xmlns:fx="http://javafx.com/fxml"
            fx:controller="controller.LoginController"
-           prefWidth="1000"
-           prefHeight="700"
+           prefWidth="1300"
+           prefHeight="770"
            style="-fx-background-color: linear-gradient(to bottom right, #e0f2fe, #ffffff);">
 
     <Pane>

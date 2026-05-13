@@ -35,7 +35,7 @@ public class HelloApp extends Application {
         // ====== Mở màn hình Login ======
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/view/login.fxml"));
-        Scene scene = new Scene(loader.load(), 1000, 700);
+        Scene scene = new Scene(loader.load());
         stage.setTitle("Online Auction System");
         stage.setScene(scene);
         stage.show();
