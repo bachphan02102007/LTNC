@@ -1,59 +1,72 @@
 package util.Singleton;
 
 import model.Auction;
+import model.AuctionStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-public class AuctionManager { // người quản lý đấu giá
-    // Singleton: chỉ tồn tại 1 instance duy nhất trong toàn bộ chương trình
+import java.util.stream.Collectors;
+
+public class AuctionManager {
     private static AuctionManager instance;
     private final List<Auction> auctions;
 
-
-    // private constructor → không ai new AuctionManager() từ bên ngoài được
     private AuctionManager() {
         auctions = new ArrayList<>();
     }
 
-    // synchronized để thread-safe khi nhiều thread cùng gọi lần đầu
-    //static là biến thuộc về class nhờ đó chương trình chỉ có 1 instance
-    //Nếu không static, mỗi lần bạn tạo AuctionManager mới thì sẽ có một biến instance riêng biệt, phá vỡ nguyên tắc Singleton.
     public static synchronized AuctionManager getInstance() {
         if(instance == null ) {
-            instance = new AuctionManager();   // chỉ được tạo 1 đói tương duy nhất
+            instance = new AuctionManager();
         }
         return instance;
     }
-    public void addAuction(Auction auction) {
-        auctions.add(auction);
-    }
-    public Optional<Auction> findById(String id) { // pt công khai tra về Optional<Auction>.
-        return auctions.stream().filter(a -> a.getAuctionId().equals(id))
-                .findFirst(); // lọc các phần tử trong stream giữ lại phiên đấu giá giống với giá tr id truyền vào
-    }                         // ấy cái đầu tiên nếu thấy
 
-    //Lấy toàn bộ danh sách phiên đấu giá.
-    //Trả về bản sao (new ArrayList<>(...)) để tránh việc bên ngoài sửa trực tiếp danh sách gốc
-    public List<Auction> getAllAuctions() {
-        return new ArrayList<>(auctions);
+    public synchronized void addAuction(Auction auction) {
+        if (findById(auction.getAuctionId()).isEmpty()) auctions.add(auction);
     }
 
-    //Lọc ra các phiên đấu giá đang ở trạng thái RUNNING.
-    //Sử dụng Java Stream API để duyệt và lọc.
-    public List<Auction> getRunningAuctions() {
+    public synchronized Optional<Auction> findById(String id) {
+        return auctions.stream().filter(a -> a.getAuctionId().equals(id)).findFirst();
+    }
+
+    public synchronized List<Auction> getAllAuctions() {
         return auctions.stream()
-                .filter(a -> a.getStatus().name().equals("RUNNING"))
-                .collect(java.util.stream.Collectors.toList());
+                .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
-    public void clearAuctions() {
-        auctions.clear();
-    }
-    public List<Auction> getVisibleAuctions() {
-        java.time.LocalDateTime now = java.time.LocalDateTime.now();
 
+    public synchronized List<Auction> getRunningAuctions() {
+        return auctions.stream()
+                .filter(a -> a.getStatus() == AuctionStatus.RUNNING)
+                .collect(Collectors.toList());
+    }
+
+    public synchronized List<Auction> findBySeller(String sellerUsername) {
+        return auctions.stream()
+                .filter(a -> sellerUsername != null && sellerUsername.equals(a.getSellerUsername()))
+                .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
+                .collect(Collectors.toList());
+    }
+
+    public synchronized boolean cancelAuction(String auctionId) {
+        Optional<Auction> auction = findById(auctionId);
+        auction.ifPresent(Auction::cancelAuction);
+        return auction.isPresent();
+    }
+
+    public synchronized boolean removeAuction(String auctionId) {
+        return auctions.removeIf(a -> a.getAuctionId().equals(auctionId));
+    }
+
+    public synchronized void clearAuctions() { auctions.clear(); }
+
+    public synchronized List<Auction> getVisibleAuctions() {
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
         return auctions.stream()
                 .filter(a -> a.getEndTime().plusDays(1).isAfter(now))
-                .collect(java.util.stream.Collectors.toList());
+                .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
+                .collect(Collectors.toList());
     }
 }

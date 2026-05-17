@@ -29,11 +29,15 @@ public class SocketClient {
      * Starts the background listener thread.
      */
     public void connect(String username, Consumer<String> onMessage) throws IOException {
+        connect(username, null, onMessage);
+    }
+
+    public void connect(String username, String role, Consumer<String> onMessage) throws IOException {
         this.onMessage = onMessage;
         socket = new Socket(HOST, PORT);
         out = new PrintWriter(socket.getOutputStream(), true);
         in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out.println(username);
+        out.println(role == null || role.isBlank() ? username : username + "|" + role);
         running = true;
         startListenerThread();
     }
@@ -86,6 +90,38 @@ public class SocketClient {
     /** Seller posts new item: ADD_ITEM:name:startPrice:durationSeconds:category */
     public void sendAddItem(String name, double startPrice, int durationSec, String category) {
         sendCommand("ADD_ITEM:" + name + ":" + startPrice + ":" + durationSec + ":" + category);
+    }
+
+    public void requestWallet() {
+        sendCommand("WALLET:INFO");
+    }
+
+    public void deposit(double amount) {
+        sendCommand("WALLET:DEPOSIT:" + amount);
+    }
+
+    public void withdraw(double amount) {
+        sendCommand("WALLET:WITHDRAW:" + amount);
+    }
+
+    public void updateProfile(String fullName, String phone, String newPassword) {
+        sendCommand("PROFILE:UPDATE:" + safe(fullName) + ":" + safe(phone) + ":" + safe(newPassword));
+    }
+
+    public void requestDetail(String auctionId) {
+        sendCommand("DETAIL:" + safe(auctionId));
+    }
+
+    public void requestMyAuctions() {
+        sendCommand("MY_AUCTIONS");
+    }
+
+    public void sendPay(String auctionId) {
+        sendCommand("PAY:" + auctionId);
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.replace(":", " ").trim();
     }
 
     /** Send raw command (thread-safe). */

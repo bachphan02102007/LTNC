@@ -21,6 +21,7 @@ public class RegisterController implements Initializable {
     @FXML private TextField     usernameField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmField;
+    @FXML private TextField     phoneField;
     @FXML private ComboBox<String> roleCombo;
     @FXML private Label         errorLabel;
     @FXML private Label         successLabel;
@@ -39,9 +40,10 @@ public class RegisterController implements Initializable {
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
         String confirm  = confirmField.getText().trim();
+        String phone    = phoneField.getText().trim();
         String role     = roleCombo.getValue();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
             errorLabel.setText("Vui long nhap day du thong tin!"); return;
         }
         if (!password.equals(confirm)) {
@@ -50,11 +52,19 @@ public class RegisterController implements Initializable {
         if (username.length() < 3) {
             errorLabel.setText("Ten dang nhap phai co it nhat 3 ky tu!"); return;
         }
+        if (!phone.matches("[0-9+ ]{8,15}")) {
+            errorLabel.setText("So dien thoai khong hop le!"); return;
+        }
 
         String id = UUID.randomUUID().toString().substring(0, 8);
-        User newUser = role.equals("Seller")
-                ? new Seller(id, username, password)
-                : new Bidder(id, username, password);
+        User newUser;
+        if ("Seller".equals(role)) {
+            newUser = new Seller(id, username, password, phone);
+        } else if ("Admin".equals(role)) {
+            newUser = new Admin(id, username, password, phone);
+        } else {
+            newUser = new Bidder(id, username, password, phone);
+        }
 
         try {
             UserManager.getInstance().addUser(newUser);

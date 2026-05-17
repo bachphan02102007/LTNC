@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.Admin;
 import model.Seller;
 import model.User;
 import util.SessionManager;
@@ -44,12 +45,14 @@ public class LoginController {
                                 Stage stage = (Stage) usernameField.getScene().getWindow();
                                 if (user instanceof Seller) {
                                     goSeller(stage, (Seller) user);
+                                } else if (user instanceof Admin) {
+                                    goAdmin(stage, (Admin) user);
                                 } else {
                                     // Bidder/Admin phải connect socket trước khi vào AuctionList
                                     try {
                                         SessionManager.getInstance()
                                                 .getSocketClient()
-                                                .connect(user.getUsername(), msg -> {
+                                                .connect(user.getUsername(), "BIDDER", msg -> {
                                                     System.out.println("[Bidder socket] " + msg);
                                                 });
                                     } catch (Exception e) {
@@ -72,6 +75,16 @@ public class LoginController {
                 getClass().getResource("/view/auction_list.fxml"));
         stage.setScene(new Scene(loader.load()));
         stage.setTitle("Danh sach Phien Dau Gia");
+        stage.show();
+    }
+
+    private void goAdmin(Stage stage, Admin admin) throws Exception {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/view/admin_dashboard.fxml"));
+        stage.setScene(new Scene(loader.load()));
+        stage.setTitle("Quan tri he thong - Admin");
+        AdminController ctrl = loader.getController();
+        ctrl.initData(admin, SessionManager.getInstance().getSocketClient());
         stage.show();
     }
 

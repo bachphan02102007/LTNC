@@ -6,6 +6,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,9 +21,12 @@ import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import model.Auction;
+import model.AuctionStatus;
 import model.BidTransaction;
 import model.Bidder;
+import model.Item;
 import model.User;
+import util.Factory.ItemFactory;
 import network.SocketClient;
 import util.SessionManager;
 import util.Singleton.AuctionManager;
@@ -70,6 +75,8 @@ public class AuctionRoomController implements Initializable {
     private User currentUser;
     private String currentAuctionId;
     private Auction currentAuction;
+    private String sellerUsername = "";
+    private String sellerPhone = "";
     private Timeline countdownTimeline;
     private final ObservableList<String>         logMessages  = FXCollections.observableArrayList();
     private final ObservableList<BidTransaction> bidHistory   = FXCollections.observableArrayList();
@@ -181,6 +188,7 @@ public class AuctionRoomController implements Initializable {
             setStatus("✅ Đã kết nối", Color.GREEN);
             buttonBid.setDisable(false);
             addLog("👋 Đã vào phòng đấu giá " + currentAuctionId);
+            socketClient.requestDetail(currentAuctionId);
         } else {
             // Fallback: tạo kết nối mới nếu SessionManager chưa có
             socketClient = new SocketClient();
@@ -190,6 +198,7 @@ public class AuctionRoomController implements Initializable {
                 setStatus("✅ Đã kết nối", Color.GREEN);
                 buttonBid.setDisable(false);
                 addLog("👋 Đã vào phòng đấu giá " + currentAuctionId);
+                socketClient.requestDetail(currentAuctionId);
             } catch (IOException e) {
                 setStatus("❌ Không thể kết nối server", Color.RED);
                 addLog("Lỗi: " + e.getMessage());
@@ -205,7 +214,11 @@ public class AuctionRoomController implements Initializable {
             addLog("[" + LocalDateTime.now().format(TIME_FMT) + "] " + message);
         }
 
-        if (message.startsWith("GIA_MOI:")) {
+        if (message.startsWith("DETAIL_OK:")) {
+            handleDetailOk(message);
+        } else if (message.startsWith("DETAIL_FAIL:")) {
+            setStatus("❌ " + message.substring("DETAIL_FAIL:".length()), Color.RED);
+        } else if (message.startsWith("GIA_MOI:")) {
             handleGiaMoi(message);
         } else if (message.startsWith("BID_OK:")) {
             handleBidOk(message);
@@ -215,9 +228,112 @@ public class AuctionRoomController implements Initializable {
             handleAuctionClosed(message);
         } else if (message.startsWith("TIME_EXTENDED:")) {
             handleTimeExtended(message);
+        } else if (message.startsWith("PAY_OK:")) {
+            setBidResult("✅ Thanh toán thành công!", Color.GREEN);
+            setStatus("✅ Đã thanh toán", Color.GREEN);
+        } else if (message.startsWith("PAY_FAIL:")) {
+            setBidResult("❌ Thanh toán thất bại: " + message.substring("PAY_FAIL:".length()), Color.RED);
+        } else if (message.startsWith("AUCTION_PAID:")) {
+            String[] p = message.split(":", -1);
+            if (p.length > 1 && p[1].equals(currentAuctionId)) {
+                setStatus("✅ Phiên đã tự động thanh toán", Color.GREEN);
+                buttonBid.setDisable(true);
+                addLog("✅ Server đã tự động trừ ví người thắng và thanh toán phiên này.");
+                if (socketClient != null) socketClient.requestDetail(currentAuctionId);
+            }
+        } else if (message.startsWith("WALLET_INFO:")) {
+            try {
+                currentUser.setWalletBalance(Double.parseDouble(message.substring("WALLET_INFO:".length())));
+            } catch (Exception ignored) {}
+        } else if (message.startsWith("WALLET_CHANGED:")) {
+            String[] p = message.split(":", -1);
+            if (p.length > 2 && currentUser != null && currentUser.getUsername().equals(p[1])) {
+                try {
+                    currentUser.setWalletBalance(Double.parseDouble(p[2]));
+                    addLog("💰 Ví của bạn đã cập nhật còn " + String.format("%,.0f VNĐ", currentUser.getWalletBalance()));
+                } catch (Exception ignored) {}
+            }
+        } else if (message.startsWith("USER_STATUS_CHANGED:")) {
+            String[] p = message.split(":", -1);
+            if (p.length > 2 && currentUser != null && currentUser.getUsername().equals(p[1]) && "LOCKED".equals(p[2])) {
+                buttonBid.setDisable(true);
+                setStatus("⛔ Tài khoản đã bị khóa", Color.RED);
+                addLog("⛔ Admin đã khóa tài khoản của bạn. Không thể đặt giá/thao tác mới.");
+            }
         } else if (message.startsWith("ERROR:")) {
             setStatus("❌ " + message.substring(6), Color.RED);
         }
+    }
+
+    /**
+     * DETAIL_OK:id|name|currentPrice|category|startPrice|endTime|status|seller|sellerPhone|leader|bidder#amount#time;...
+     * Dùng để reload đầy đủ lịch sử từ server khi out ra vào lại phòng.
+     */
+    private void handleDetailOk(String message) {
+        String payload = message.substring("DETAIL_OK:".length());
+        String[] p = payload.split("\\|", -1);
+        if (p.length < 10 || !p[0].equals(currentAuctionId)) return;
+        try {
+            String name = p[1];
+            double currentPrice = Double.parseDouble(p[2]);
+            String category = p[3];
+            double startPrice = Double.parseDouble(p[4]);
+            LocalDateTime endTime = LocalDateTime.parse(p[5]);
+            AuctionStatus status = AuctionStatus.valueOf(p[6]);
+            sellerUsername = p[7];
+            sellerPhone = p[8];
+            String leader = p[9];
+
+            Item item = ItemFactory.create(category, "ITEM-" + currentAuctionId, name, "", startPrice, sellerUsername);
+            currentAuction = new Auction(currentAuctionId, item, endTime, sellerUsername);
+            if (endTime.isAfter(LocalDateTime.now()) && (status == AuctionStatus.OPEN || status == AuctionStatus.RUNNING)) {
+                currentAuction.startAuction();
+            }
+
+            labelItemName.setText(name);
+            labelCurrentBid.setText(String.format("%,.0f VNĐ", currentPrice));
+            labelCategory.setText(category);
+            labelStartPrice.setText(String.format("%,.0f VNĐ", startPrice));
+            labelLeader.setText(leader == null || leader.isBlank() ? "Người dẫn đầu: —" : "👑 Người dẫn đầu: " + leader);
+            startCountdown(endTime);
+
+            List<BidTransaction> loadedHistory = new ArrayList<>();
+            if (p.length > 10 && !p[10].isBlank()) {
+                String[] rows = p[10].split(";");
+                for (String row : rows) {
+                    String[] b = row.split("#", -1);
+                    if (b.length >= 3) {
+                        loadedHistory.add(new BidTransaction("BID-LOAD", new Bidder("", b[0], b.length > 3 ? b[3] : ""),
+                                Double.parseDouble(b[1]), LocalDateTime.parse(b[2])));
+                    }
+                }
+            }
+            currentAuction.restoreSnapshot(currentPrice, leader, status, loadedHistory);
+            bidHistory.setAll(loadedHistory);
+            bidHistory.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+            labelBidCount.setText(String.valueOf(bidHistory.size()));
+            tableBidHistory.refresh();
+
+            if (status == AuctionStatus.FINISHED || status == AuctionStatus.PAID || status == AuctionStatus.CANCELED) {
+                buttonBid.setDisable(true);
+                fieldBidAmount.setDisable(true);
+                labelCountdown.setText(status == AuctionStatus.PAID ? "ĐÃ THANH TOÁN" : "KẾT THÚC");
+                setStatus("Trạng thái: " + status, Color.PURPLE);
+            }
+            addLog("✅ Đã tải lại dữ liệu phòng, lịch sử bid được đồng bộ từ server.");
+        } catch (Exception e) {
+            addLog("Không đọc được chi tiết phiên: " + e.getMessage());
+        }
+    }
+
+    private void handlePayOk(String message) {
+        String[] p = message.split(":", -1);
+        String amount = p.length > 2 ? p[2] : "";
+        String seller = p.length > 3 ? p[3] : sellerUsername;
+        String phone = p.length > 4 ? p[4] : sellerPhone;
+        setBidResult("✅ Thanh toán thành công!", Color.GREEN);
+        setStatus("✅ Đã thanh toán", Color.GREEN);
+        addLog("✅ Đã trừ ví và thanh toán " + amount + " VNĐ. Liên hệ Seller: " + seller + " - " + phone);
     }
 
     /**
@@ -231,6 +347,13 @@ public class AuctionRoomController implements Initializable {
 
         double amount = Double.parseDouble(parts[2]);
         String bidderName = parts[3];
+
+        if (currentAuction != null && amount > currentAuction.getCurrentHighestBid()) {
+            // Đồng bộ trạng thái local để quick-bid và validate dùng giá mới nhất.
+            try {
+                currentAuction.placeBid(new Bidder("", bidderName, ""), amount);
+            } catch (Exception ignored) {}
+        }
 
         labelCurrentBid.setText(String.format("%,.0f VNĐ", amount));
         labelCurrentBid.setTextFill(Color.ORANGERED);
@@ -250,6 +373,7 @@ public class AuctionRoomController implements Initializable {
         tableBidHistory.refresh();
 
         addLog("🔔 " + bidderName + " vừa đặt " + String.format("%,.0f VNĐ", amount));
+        if (socketClient != null) socketClient.requestDetail(currentAuctionId);
     }
 
     /** BID_OK:amount */
@@ -259,6 +383,7 @@ public class AuctionRoomController implements Initializable {
                 + " thành công!", Color.GREEN);
         fieldBidAmount.clear();
         setStatus("✅ Đặt giá thành công", Color.GREEN);
+        if (socketClient != null) socketClient.requestDetail(currentAuctionId);
     }
 
     /** BID_FAIL:reason */
@@ -279,6 +404,10 @@ public class AuctionRoomController implements Initializable {
 
         String winner     = parts[2];
         String finalPrice = parts[3];
+        if (parts.length > 4) sellerUsername = parts[4];
+        if (parts.length > 5) sellerPhone = parts[5];
+        String winnerPhone = parts.length > 6 ? parts[6] : "";
+        String autoPayStatus = parts.length > 7 ? parts[7] : "";
 
         if (countdownTimeline != null) countdownTimeline.stop();
         labelCountdown.setText("KẾT THÚC");
@@ -289,10 +418,12 @@ public class AuctionRoomController implements Initializable {
         setStatus("🏁 Phiên kết thúc!", Color.PURPLE);
         addLog("🏁 Phiên kết thúc! Người thắng: " + winner
                 + " — " + String.format("%,.0f VNĐ",
-                Double.parseDouble(finalPrice)));
+                Double.parseDouble(finalPrice))
+                + (winnerPhone == null || winnerPhone.isBlank() ? "" : " | SĐT winner: " + winnerPhone)
+                + ("AUTO_PAID".equals(autoPayStatus) ? " | Đã tự động trừ ví" : " | " + autoPayStatus));
 
         // Popup thông báo kết quả
-        showResultDialog(winner, finalPrice, iWon);
+        showResultDialog(winner, finalPrice, iWon, autoPayStatus);
     }
 
     /**
@@ -312,7 +443,7 @@ public class AuctionRoomController implements Initializable {
 
     // ── Popup kết quả ─────────────────────────────────────────────────────────
 
-    private void showResultDialog(String winner, String finalPrice, boolean iWon) {
+    private void showResultDialog(String winner, String finalPrice, boolean iWon, String autoPayStatus) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         if (iWon) {
             alert.setTitle("🎉 Chúc mừng!");
@@ -321,7 +452,10 @@ public class AuctionRoomController implements Initializable {
                     ? currentAuction.getItem().getName() : "—")
                     + "\nGiá thắng: " + String.format("%,.0f VNĐ",
                     Double.parseDouble(finalPrice))
-                    + "\n\nVui lòng liên hệ Seller để hoàn tất giao dịch.");
+                    + "\nĐã tự động trừ tiền trong ví."
+                    + "\nSeller: " + (sellerUsername == null || sellerUsername.isBlank() ? "—" : sellerUsername)
+                    + "\nSĐT Seller: " + (sellerPhone == null || sellerPhone.isBlank() ? "—" : sellerPhone)
+                    + "\n\nHãy liên hệ Seller để nhận hàng/hoàn tất giao dịch.");
         } else if ("KHONG_AI".equals(winner) || winner.isEmpty()) {
             alert.setTitle("Phiên kết thúc");
             alert.setHeaderText("Không có người đặt giá");
@@ -333,6 +467,7 @@ public class AuctionRoomController implements Initializable {
                     Double.parseDouble(finalPrice)));
         }
         alert.showAndWait();
+        // Không hỏi thanh toán thủ công nữa: server đã tự động trừ ví khi phiên kết thúc.
     }
 
     // ── Đặt giá ──────────────────────────────────────────────────────────────

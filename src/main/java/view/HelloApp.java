@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Auction;
+import model.Admin;
 import model.User;
 import util.Singleton.AuctionManager;
 import util.DataStorage;
@@ -26,6 +27,13 @@ public class HelloApp extends Application {
             } catch (AuthenticationException ignored) {}
         });
         System.out.println("Da tai " + savedUsers.size() + " users tu file.");
+        if (UserManager.getInstance().findByUsername("admin").isEmpty()) {
+            try {
+                Admin admin = new Admin("ADMIN", "admin", "admin", "0000000000");
+                UserManager.getInstance().addUser(admin);
+                DataStorage.saveUsers(UserManager.getInstance().getAllUsers());
+            } catch (AuthenticationException ignored) {}
+        }
 
         List<Auction> savedAuctions = DataStorage.loadAuctions();
         savedAuctions.forEach(a ->

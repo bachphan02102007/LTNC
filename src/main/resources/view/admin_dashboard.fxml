@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.AdminController"
+            prefWidth="1300"
+            prefHeight="770"
+            style="-fx-background-color: linear-gradient(to bottom right, #eff6ff, #ffffff);">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color: white; -fx-padding: 22 28; -fx-border-color: #dbeafe; -fx-border-width: 0 0 1 0;">
+            <VBox spacing="4">
+                <Label text="Admin Dashboard" style="-fx-text-fill: #0284c7; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label text="Quản trị hệ thống đấu giá" style="-fx-text-fill: #0f172a; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                <Label fx:id="labelStats" text="—" style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Tải lại" onAction="#handleReload"
+                    style="-fx-background-color: #e0f2fe; -fx-text-fill: #0369a1; -fx-font-weight: bold; -fx-background-radius: 14; -fx-padding: 10 18;"/>
+            <MenuButton text="▼" style="-fx-background-color: white; -fx-text-fill: #0284c7; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #bfdbfe;">
+                <items>
+                    <MenuItem text="Hồ sơ tài khoản" onAction="#handleProfile"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Đăng xuất" onAction="#handleLogout"/>
+                </items>
+            </MenuButton>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox spacing="24" style="-fx-padding: 30;">
+            <VBox spacing="14" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-padding: 24; -fx-background-radius: 28; -fx-border-radius: 28; -fx-border-color: #dbeafe; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.12), 16, 0, 0, 6);">
+                <Label text="Người dùng" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                <ListView fx:id="listUsers" VBox.vgrow="ALWAYS" style="-fx-background-color: #f8fbff; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #bfdbfe; -fx-font-size: 14px;"/>
+                <HBox spacing="10">
+                    <Button text="Khóa tài khoản" onAction="#handleDeactivateUser" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            style="-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 16;"/>
+                    <Button text="Mở lại" onAction="#handleActivateUser" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            style="-fx-background-color: #dcfce7; -fx-text-fill: #15803d; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 16;"/>
+                </HBox>
+            </VBox>
+            <VBox spacing="14" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-padding: 24; -fx-background-radius: 28; -fx-border-radius: 28; -fx-border-color: #dbeafe; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.12), 16, 0, 0, 6);">
+                <Label text="Phiên đấu giá" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                <ListView fx:id="listAuctions" VBox.vgrow="ALWAYS" style="-fx-background-color: #f8fbff; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #bfdbfe; -fx-font-size: 14px;"/>
+                <HBox spacing="10">
+                    <Button text="Hủy phiên" onAction="#handleCancelAuction" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            style="-fx-background-color: #ffedd5; -fx-text-fill: #c2410c; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 16;"/>
+                    <Button text="Xóa khỏi list" onAction="#handleDeleteAuction" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            style="-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 16;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>
