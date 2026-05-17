@@ -2,6 +2,7 @@ package network;
 
 import exception.AuthenticationException;
 import model.Auction;
+import model.Admin;
 import model.User;
 import util.Singleton.AuctionManager;
 import util.DataStorage;
@@ -29,9 +30,24 @@ public class AuctionServer {
             catch (AuthenticationException ignored) {}
         });
         System.out.println("Da tai " + savedUsers.size() + " users tu file.");
+        if (UserManager.getInstance().findByUsername("admin").isEmpty()) {
+            try {
+                Admin admin = new Admin("ADMIN", "admin", "admin", "0000000000");
+                UserManager.getInstance().addUser(admin);
+                DataStorage.saveUsers(UserManager.getInstance().getAllUsers());
+                System.out.println("Da tao tai khoan admin mac dinh: admin/admin");
+            } catch (AuthenticationException ignored) {}
+        }
 
         List<Auction> savedAuctions = DataStorage.loadAuctions();
-        savedAuctions.forEach(a -> AuctionManager.getInstance().addAuction(a));
+        savedAuctions.forEach(a -> {
+            a.addObserver(new ServerBroadcastObserver());
+            if (a.getStatus() == model.AuctionStatus.OPEN || a.getStatus() == model.AuctionStatus.RUNNING) {
+                a.resumeScheduler();
+            }
+            AuctionManager.getInstance().addAuction(a);
+        });
+        DataStorage.saveAuctions(AuctionManager.getInstance().getAllAuctions());
         System.out.println("Da tai " + savedAuctions.size() + " phien dau gia tu file.");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

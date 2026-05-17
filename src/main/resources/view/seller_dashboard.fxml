@@ -50,8 +50,7 @@
                                -fx-cursor: hand;">
 
                 <items>
-                    <MenuItem text="Hồ sơ tài khoản"/>
-                    <MenuItem text="Ví đấu giá"/>
+                    <MenuItem text="Hồ sơ tài khoản" onAction="#handleProfile"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Đăng xuất"
                               onAction="#handleLogout"/>
@@ -130,6 +129,12 @@
                                style="-fx-text-fill: #94a3b8;"/>
                     </placeholder>
                 </ListView>
+                <HBox spacing="10">
+                    <Button text="Xem chi tiết phiên" onAction="#handleViewSelectedAuction" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            style="-fx-background-color: #e0f2fe; -fx-text-fill: #0369a1; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 16;"/>
+                    <Button text="Xóa sản phẩm/phiên" onAction="#handleDeleteSelectedAuction" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            style="-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 16;"/>
+                </HBox>
             </VBox>
 
         </HBox>

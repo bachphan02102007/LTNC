@@ -57,8 +57,9 @@
                    -fx-border-color: #bfdbfe;">
 
                 <items>
-                    <MenuItem text="Hồ sơ tài khoản"/>
-                    <MenuItem text="Ví đấu giá"/>
+                    <MenuItem text="Hồ sơ tài khoản" onAction="#handleProfile"/>
+                    <MenuItem text="Ví đấu giá" onAction="#handleWallet"/>
+                    <MenuItem text="Phiên tôi đã tham gia / thắng" onAction="#handleMyBidderAuctions"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Đăng xuất"
                               onAction="#handleLogout"/>

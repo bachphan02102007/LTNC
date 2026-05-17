@@ -60,6 +60,11 @@
                                   -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #bfdbfe;
                                   -fx-padding: 0 14;"/>
 
+            <TextField fx:id="phoneField" promptText="Số điện thoại liên hệ"
+                       style="-fx-pref-width: 300; -fx-pref-height: 44; -fx-background-color: white;
+                              -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #bfdbfe;
+                              -fx-padding: 0 14;"/>
+
             <ComboBox fx:id="roleCombo"
                       promptText="Chọn vai trò"
                       style="-fx-pref-width: 300; -fx-pref-height: 44; -fx-background-color: white;

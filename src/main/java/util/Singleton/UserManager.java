@@ -1,6 +1,5 @@
 package util.Singleton;
 
-
 import exception.AuthenticationException;
 import model.User;
 
@@ -20,26 +19,57 @@ public class UserManager {
         return instance;
     }
 
-    //Phương thức này dùng để thêm user mới vào danh sách users, đồng thời kiểm tra xem username đã tồn tại chưa.
-    public void addUser(User user) throws AuthenticationException {
+    public synchronized void addUser(User user) throws AuthenticationException {
         boolean exists = users.stream()
-                .anyMatch(u -> u.getUsername().equals(user.getUsername()));
+                .anyMatch(u -> u.getUsername().equalsIgnoreCase(user.getUsername()));
         if (exists) throw new AuthenticationException(
                 "Ten dang nhap '" + user.getUsername() + "' da ton tai!");
         users.add(user);
     }
-    //Phương thức này dùng để xác thực đăng nhập (login/authentication).
-    //
-    //Nó kiểm tra xem trong danh sách users có user nào:
-    //
-    //username trùng với username truyền vào
-    //password trùng với password truyền vào
-    public Optional<User> authenticate(String username, String password) {
+
+    public synchronized Optional<User> authenticate(String username, String password) {
         return users.stream()
+                .filter(u -> u.isActive())
                 .filter(u -> u.getUsername().equals(username)
                         && u.getPassword().equals(password))
                 .findFirst();
     }
 
-    public List<User> getAllUsers() { return new ArrayList<>(users); }
+    public synchronized Optional<User> findByUsername(String username) {
+        return users.stream()
+                .filter(u -> u.getUsername().equals(username))
+                .findFirst();
+    }
+
+    public synchronized boolean deactivateUser(String username) {
+        Optional<User> user = findByUsername(username);
+        user.ifPresent(u -> u.setActive(false));
+        return user.isPresent();
+    }
+
+    public synchronized boolean activateUser(String username) {
+        Optional<User> user = findByUsername(username);
+        user.ifPresent(u -> u.setActive(true));
+        return user.isPresent();
+    }
+
+    public synchronized List<User> getAllUsers() { return new ArrayList<>(users); }
+
+    public synchronized void loadFrom(List<User> latestUsers) {
+        users.clear();
+        users.addAll(latestUsers);
+    }
+
+    public synchronized void syncUser(User latest) {
+        if (latest == null) return;
+        findByUsername(latest.getUsername()).ifPresentOrElse(existing -> {
+            existing.setFullName(latest.getFullName());
+            existing.setPhoneNumber(latest.getPhoneNumber());
+            existing.setPassword(latest.getPassword());
+            existing.setWalletBalance(latest.getWalletBalance());
+            existing.setActive(latest.isActive());
+        }, () -> users.add(latest));
+    }
+
+    public synchronized void clearUsers() { users.clear(); }
 }
