@@ -19,7 +19,13 @@ public class ItemFactory {
 
         switch (type.toUpperCase()) {
             case "ELECTRONICS":
-                int warranty = Integer.parseInt(extraInfo); // có thể throw NumberFormatException
+            case "ELECTRIC":
+                int warranty = 0;
+                try {
+                    warranty = Integer.parseInt(extraInfo == null || extraInfo.isBlank() ? "0" : extraInfo.trim());
+                } catch (NumberFormatException ignored) {
+                    warranty = 0; // Khi tạo nhanh từ UI Seller, không cần nhập bảo hành.
+                }
                 if (warranty < 0)
                     throw new IllegalArgumentException("Thoi gian bao hanh khong the am!");
                 return new Electronics(id, name, description, startingPrice, warranty);

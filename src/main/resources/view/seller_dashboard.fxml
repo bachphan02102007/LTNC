@@ -51,6 +51,7 @@
 
                 <items>
                     <MenuItem text="Hồ sơ tài khoản" onAction="#handleProfile"/>
+                    <MenuItem text="Ví đấu giá" onAction="#handleWallet"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Đăng xuất"
                               onAction="#handleLogout"/>

@@ -303,11 +303,7 @@ public class AuctionListController implements Initializable {
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        UiDialogs.showInfo(title, content);
     }
 
     @FXML
@@ -321,32 +317,7 @@ public class AuctionListController implements Initializable {
     }
 
     private void showMyBidderAuctions(String payload) {
-        String[] sections = payload.split("::", -1);
-        String joined = sections.length > 0 ? sections[0] : "EMPTY";
-        String won = sections.length > 1 ? sections[1] : "EMPTY";
-        StringBuilder sb = new StringBuilder();
-        sb.append("CÁC PHIÊN ĐÃ THAM GIA:\n");
-        appendAuctionRows(sb, joined);
-        sb.append("\nCÁC PHIÊN ĐÃ THẮNG:\n");
-        appendAuctionRows(sb, won);
-        UiDialogs.showInfo("Phiên của tôi", sb.toString());
-    }
-
-    private void appendAuctionRows(StringBuilder sb, String data) {
-        if (data == null || data.isBlank() || data.equals("EMPTY")) {
-            sb.append("• Chưa có dữ liệu.\n");
-            return;
-        }
-        for (String row : data.split(",")) {
-            String[] p = row.split("\\|", -1);
-            if (p.length < 6) continue;
-            sb.append("• ").append(p[0]).append(" — ").append(p[1])
-              .append(" | Giá: ").append(String.format("%,.0f", Double.parseDouble(p[2]))).append(" VNĐ")
-              .append(" | Trạng thái: ").append(p[5])
-              .append(p.length > 6 && !p[6].isBlank() ? " | Seller: " + p[6] : "")
-              .append(p.length > 7 && !p[7].isBlank() ? " | Leader/Winner: " + p[7] : "")
-              .append("\n");
-        }
+        UiDialogs.showBidderAuctionsDialog(payload);
     }
 
     @FXML

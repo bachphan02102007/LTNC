@@ -41,11 +41,19 @@ public class ServerBroadcastObserver implements AuctionObserver {
             winnerPhone = winnerUser.map(User::getPhoneNumber).orElse(auction.getCurrentLeader().getPhoneNumber());
             try {
                 if (winnerUser.isPresent()) {
-                    winnerUser.get().withdraw(auction.getCurrentHighestBid());
+                    double finalAmount = auction.getCurrentHighestBid();
+                    winnerUser.get().withdraw(finalAmount);
+
+                    java.util.Optional<User> sellerUser = UserManager.getInstance().findByUsername(seller);
+                    if (sellerUser.isPresent() && sellerUser.get().supportsWallet()) {
+                        sellerUser.get().deposit(finalAmount);
+                    }
+
                     auction.markPaid();
                     autoPayStatus = "AUTO_PAID";
                     DataStorage.saveUsers(UserManager.getInstance().getAllUsers());
                     AuctionServer.broadcastAll("WALLET_CHANGED:" + winner + ":" + winnerUser.get().getWalletBalance());
+                    sellerUser.ifPresent(u -> AuctionServer.broadcastAll("WALLET_CHANGED:" + u.getUsername() + ":" + u.getWalletBalance()));
                 } else {
                     autoPayStatus = "PAY_FAIL_USER_NOT_FOUND";
                 }

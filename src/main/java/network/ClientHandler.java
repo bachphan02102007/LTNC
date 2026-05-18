@@ -226,7 +226,7 @@ public class ClientHandler implements Runnable {
         Item item;
         try {
             String itemId = "ITEM-" + System.currentTimeMillis() % 100000;
-            item = ItemFactory.create(category.toUpperCase(), itemId, name, "", startPrice, clientName);
+            item = ItemFactory.create(category.toUpperCase(), itemId, name, "", startPrice, "0");
         } catch (Exception e) {
             out.println("ADD_ITEM_FAIL:Danh muc khong hop le: " + category);
             return;

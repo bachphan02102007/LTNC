@@ -63,6 +63,10 @@ public class AdminController implements Initializable {
             UiDialogs.showError("Admin", message.substring("LOCK_USER_FAIL:".length()));
         } else if (message.startsWith("UNLOCK_USER_FAIL:")) {
             UiDialogs.showError("Admin", message.substring("UNLOCK_USER_FAIL:".length()));
+        } else if (message.startsWith("DETAIL_OK:")) {
+            UiDialogs.showAuctionDetailDialog("Chi tiết phiên đấu giá", message.substring("DETAIL_OK:".length()));
+        } else if (message.startsWith("DETAIL_FAIL:")) {
+            UiDialogs.showError("Admin", message.substring("DETAIL_FAIL:".length()));
         } else if (message.startsWith("AUCTION_DELETED:")
                 || message.startsWith("AUCTION_CANCELED:")
                 || message.startsWith("NEW_AUCTION:")
@@ -76,10 +80,56 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        if (listUsers != null) {
+            listUsers.setCellFactory(list -> new javafx.scene.control.ListCell<>() {
+                @Override protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                    setWrapText(true);
+                    setStyle(empty ? "" : "-fx-padding: 10; -fx-background-color: #ffffff; -fx-background-radius: 14; "
+                            + "-fx-border-color: #dbeafe; -fx-border-radius: 14; -fx-text-fill: #0f172a; -fx-font-size: 13px;");
+                }
+            });
+        }
+        if (listAuctions != null) {
+            listAuctions.setCellFactory(list -> new javafx.scene.control.ListCell<>() {
+                @Override protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                    setWrapText(true);
+                    setStyle(empty ? "" : "-fx-padding: 10; -fx-background-color: #ffffff; -fx-background-radius: 14; "
+                            + "-fx-border-color: #dbeafe; -fx-border-radius: 14; -fx-text-fill: #0f172a; -fx-font-size: 13px;");
+                }
+            });
+        }
         reload();
     }
 
     @FXML private void handleReload() { reload(); }
+
+
+    @FXML
+    private void handleViewAuctionDetail() {
+        String selected = listAuctions.getSelectionModel().getSelectedItem();
+        if (selected == null) { showWarning("Hãy chọn một phiên đấu giá để xem chi tiết."); return; }
+        String auctionId = selected.split("\\|")[0].trim();
+        if (socketClient != null && socketClient.isConnected()) {
+            socketClient.requestDetail(auctionId);
+        } else {
+            AuctionManager.getInstance().findById(auctionId).ifPresentOrElse(a -> {
+                String leader = a.getCurrentLeader() == null ? "" : a.getCurrentLeader().getUsername();
+                String history = a.getBidHistory().stream()
+                        .map(tx -> tx.getBidder().getUsername() + "#" + tx.getAmount() + "#" + tx.getTimestamp() + "#" + tx.getBidder().getPhoneNumber())
+                        .collect(Collectors.joining(";"));
+                String seller = a.getSellerUsername() == null ? "" : a.getSellerUsername();
+                String sellerPhone = UserManager.getInstance().findByUsername(seller).map(User::getPhoneNumber).orElse("");
+                UiDialogs.showAuctionDetailDialog("Chi tiết phiên đấu giá",
+                        a.getAuctionId() + "|" + a.getItem().getName() + "|" + a.getCurrentHighestBid() + "|"
+                        + a.getItem().getClass().getSimpleName().toUpperCase() + "|" + a.getItem().getStartingPrice() + "|"
+                        + a.getEndTime() + "|" + a.getStatus() + "|" + seller + "|" + sellerPhone + "|" + leader + "|" + history);
+            }, () -> UiDialogs.showError("Admin", "Không tìm thấy phiên."));
+        }
+    }
 
     @FXML
     private void handleCancelAuction() {
