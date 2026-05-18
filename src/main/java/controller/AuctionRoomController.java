@@ -30,6 +30,7 @@ import util.Factory.ItemFactory;
 import network.SocketClient;
 import util.SessionManager;
 import util.Singleton.AuctionManager;
+import util.UiDialogs;
 
 /**
  * Màn hình đấu giá realtime hoàn chỉnh:
@@ -444,29 +445,25 @@ public class AuctionRoomController implements Initializable {
     // ── Popup kết quả ─────────────────────────────────────────────────────────
 
     private void showResultDialog(String winner, String finalPrice, boolean iWon, String autoPayStatus) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        String title;
+        String content;
         if (iWon) {
-            alert.setTitle("🎉 Chúc mừng!");
-            alert.setHeaderText("Bạn đã thắng phiên đấu giá!");
-            alert.setContentText("Sản phẩm: " + (currentAuction != null
-                    ? currentAuction.getItem().getName() : "—")
-                    + "\nGiá thắng: " + String.format("%,.0f VNĐ",
-                    Double.parseDouble(finalPrice))
-                    + "\nĐã tự động trừ tiền trong ví."
+            title = "🎉 Chúc mừng bạn đã thắng";
+            content = "Sản phẩm: " + (currentAuction != null ? currentAuction.getItem().getName() : "—")
+                    + "\nGiá thắng: " + String.format("%,.0f VNĐ", Double.parseDouble(finalPrice))
+                    + "\nTrạng thái: Đã tự động trừ tiền trong ví"
                     + "\nSeller: " + (sellerUsername == null || sellerUsername.isBlank() ? "—" : sellerUsername)
                     + "\nSĐT Seller: " + (sellerPhone == null || sellerPhone.isBlank() ? "—" : sellerPhone)
-                    + "\n\nHãy liên hệ Seller để nhận hàng/hoàn tất giao dịch.");
+                    + "\n\nHãy liên hệ Seller để nhận hàng/hoàn tất giao dịch.";
         } else if ("KHONG_AI".equals(winner) || winner.isEmpty()) {
-            alert.setTitle("Phiên kết thúc");
-            alert.setHeaderText("Không có người đặt giá");
-            alert.setContentText("Phiên đấu giá kết thúc mà không có người tham gia.");
+            title = "Phiên kết thúc";
+            content = "Phiên đấu giá kết thúc mà không có người tham gia.";
         } else {
-            alert.setTitle("Phiên kết thúc");
-            alert.setHeaderText("Người thắng: " + winner);
-            alert.setContentText("Giá thắng: " + String.format("%,.0f VNĐ",
-                    Double.parseDouble(finalPrice)));
+            title = "Phiên kết thúc";
+            content = "Người thắng: " + winner
+                    + "\nGiá thắng: " + String.format("%,.0f VNĐ", Double.parseDouble(finalPrice));
         }
-        alert.showAndWait();
+        UiDialogs.showInfo(title, content);
         // Không hỏi thanh toán thủ công nữa: server đã tự động trừ ví khi phiên kết thúc.
     }
 

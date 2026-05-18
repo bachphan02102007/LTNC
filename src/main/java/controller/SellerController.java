@@ -34,6 +34,17 @@ public class SellerController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         comboCategory.getItems().addAll("Electronics", "Art", "Vehicle");
         comboCategory.setValue("Electronics");
+        if (listViewMyItems != null) {
+            listViewMyItems.setCellFactory(list -> new ListCell<>() {
+                @Override protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                    setWrapText(true);
+                    setStyle(empty ? "" : "-fx-padding: 12; -fx-background-color: #f8fbff; -fx-background-radius: 16; "
+                            + "-fx-border-color: #dbeafe; -fx-border-radius: 16; -fx-text-fill: #0f172a; -fx-font-size: 13px;");
+                }
+            });
+        }
     }
 
     /**
@@ -47,6 +58,7 @@ public class SellerController implements Initializable {
         refreshMyItems();
         try {
             socketClient.connect(seller.getUsername(), "SELLER", this::handleServerMessage);
+            socketClient.requestWallet();
             socketClient.requestMyAuctions();
         } catch (Exception e) {
             showResult("❌ Không thể kết nối server: " + e.getMessage(), Color.RED);
@@ -76,6 +88,22 @@ public class SellerController implements Initializable {
             socketClient.requestMyAuctions();
         } else if (message.startsWith("DELETE_AUCTION_FAIL:")) {
             showResult("❌ " + message.substring("DELETE_AUCTION_FAIL:".length()), Color.RED);
+        } else if (message.startsWith("WALLET_OK:")) {
+            showResult("✅ " + message.substring("WALLET_OK:".length()), Color.web("#0284c7"));
+            socketClient.requestWallet();
+        } else if (message.startsWith("WALLET_FAIL:")) {
+            showResult("❌ " + message.substring("WALLET_FAIL:".length()), Color.RED);
+        } else if (message.startsWith("WALLET_INFO:")) {
+            User user = SessionManager.getInstance().getCurrentUser();
+            if (user != null) user.setWalletBalance(Double.parseDouble(message.substring("WALLET_INFO:".length())));
+        } else if (message.startsWith("WALLET_CHANGED:")) {
+            String[] w = message.split(":", -1);
+            User user = SessionManager.getInstance().getCurrentUser();
+            if (user != null && w.length > 2 && user.getUsername().equals(w[1])) {
+                user.setWalletBalance(Double.parseDouble(w[2]));
+                showResult("💰 Ví Seller đã cập nhật: " + String.format("%,.0f VNĐ", user.getWalletBalance()), Color.web("#0284c7"));
+            }
+            socketClient.requestMyAuctions();
         } else if (message.startsWith("AUCTION_DELETED:")
                 || message.startsWith("AUCTION_CANCELED:")
                 || message.startsWith("AUCTION_CLOSED:")
@@ -90,8 +118,6 @@ public class SellerController implements Initializable {
                 user.setFullName(p.length > 0 ? p[0] : "");
                 if (p.length > 1) user.setPhoneNumber(p[1]);
             }
-        } else if (message.startsWith("WALLET_HIDDEN:")) {
-            // Seller không dùng ví, bỏ qua thông báo hệ thống này.
         }
     }
 
@@ -157,8 +183,8 @@ public class SellerController implements Initializable {
                     String leader = p.length > 7 && !p[7].isBlank() ? " | Leader: " + p[7] : "";
                     String bids = p.length > 8 ? " | Bids: " + p[8] : "";
                     return p[0] + " — " + p[1]
-                            + " — Giá: " + String.format("%,.0f VNĐ", Double.parseDouble(p[2]))
-                            + " — " + p[5] + leader + bids;
+                            + "\nGiá hiện tại: " + String.format("%,.0f VNĐ", Double.parseDouble(p[2]))
+                            + "  •  Trạng thái: " + p[5] + leader + bids;
                 })
                 .toList());
     }
@@ -197,30 +223,7 @@ public class SellerController implements Initializable {
     }
 
     private void showAuctionDetail(String payload) {
-        String[] p = payload.split("\\|", -1);
-        if (p.length < 10) return;
-        StringBuilder sb = new StringBuilder();
-        sb.append("Mã phiên: ").append(p[0]).append("\n");
-        sb.append("Sản phẩm: ").append(p[1]).append("\n");
-        sb.append("Giá hiện tại: ").append(String.format("%,.0f", Double.parseDouble(p[2]))).append(" VNĐ\n");
-        sb.append("Trạng thái: ").append(p[6]).append("\n");
-        sb.append("Seller: ").append(p[7]).append(" - SĐT: ").append(p[8].isBlank() ? "—" : p[8]).append("\n");
-        sb.append("Người thắng/leader: ").append(p[9].isBlank() ? "—" : p[9]).append("\n\n");
-        sb.append("Lịch sử người đã đặt:\n");
-        if (p.length > 10 && !p[10].isBlank()) {
-            for (String row : p[10].split(";")) {
-                String[] b = row.split("#", -1);
-                if (b.length >= 3) {
-                    sb.append("• ").append(b[0])
-                      .append(b.length > 3 && !b[3].isBlank() ? " | SĐT: " + b[3] : "")
-                      .append(" | ").append(String.format("%,.0f", Double.parseDouble(b[1]))).append(" VNĐ")
-                      .append(" | ").append(b[2]).append("\n");
-                }
-            }
-        } else {
-            sb.append("Chưa có ai đặt giá.\n");
-        }
-        UiDialogs.showInfo("Chi tiết phiên của Seller", sb.toString());
+        UiDialogs.showAuctionDetailDialog("Chi tiết phiên của Seller", payload);
     }
 
     private void refreshMyItems() {
@@ -253,7 +256,7 @@ public class SellerController implements Initializable {
 
     @FXML
     private void handleWallet() {
-        UiDialogs.showInfo("Ví đấu giá", "Seller không cần ví tiền. Ví chỉ dành cho Bidder để đặt giá và thanh toán.");
+        UiDialogs.showWalletDialog();
     }
 
     @FXML

@@ -28,7 +28,7 @@ public class RegisterController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        roleCombo.setItems(FXCollections.observableArrayList("Bidder", "Seller","Admin"));
+        roleCombo.setItems(FXCollections.observableArrayList("Bidder", "Seller"));
         roleCombo.getSelectionModel().selectFirst();
     }
 
@@ -60,8 +60,6 @@ public class RegisterController implements Initializable {
         User newUser;
         if ("Seller".equals(role)) {
             newUser = new Seller(id, username, password, phone);
-        } else if ("Admin".equals(role)) {
-            newUser = new Admin(id, username, password, phone);
         } else {
             newUser = new Bidder(id, username, password, phone);
         }

@@ -46,6 +46,8 @@
                 <Label text="Phiên đấu giá" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
                 <ListView fx:id="listAuctions" VBox.vgrow="ALWAYS" style="-fx-background-color: #f8fbff; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #bfdbfe; -fx-font-size: 14px;"/>
                 <HBox spacing="10">
+                    <Button text="Xem chi tiết" onAction="#handleViewAuctionDetail" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            style="-fx-background-color: #e0f2fe; -fx-text-fill: #0369a1; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 16;"/>
                     <Button text="Hủy phiên" onAction="#handleCancelAuction" HBox.hgrow="ALWAYS" maxWidth="Infinity"
                             style="-fx-background-color: #ffedd5; -fx-text-fill: #c2410c; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 16;"/>
                     <Button text="Xóa khỏi list" onAction="#handleDeleteAuction" HBox.hgrow="ALWAYS" maxWidth="Infinity"
