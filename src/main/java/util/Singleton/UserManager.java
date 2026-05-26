@@ -72,4 +72,8 @@ public class UserManager {
     }
 
     public synchronized void clearUsers() { users.clear(); }
+
+    public void clearAll() {
+
+    }
 }

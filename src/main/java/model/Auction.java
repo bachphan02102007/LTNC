@@ -118,6 +118,9 @@ public class Auction implements Serializable {
             bidHistory.add(tx);
             notifyBidUpdated(tx);
             System.out.println("✓ " + tx);
+            if (bidder.getWalletBalance() < amount) {
+                throw new IllegalArgumentException("Lỗi: Số dư ví không đủ để thanh toán khoản đặt giá này!");
+            }
         } finally {
             lock.unlock();
         }
