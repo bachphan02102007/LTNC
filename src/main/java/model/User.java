@@ -34,7 +34,12 @@ public abstract class User implements Serializable {
     public boolean isActive() { return active; }
 
     public void setPassword(String password) {
-        if (password != null && !password.isBlank()) this.password = password;
+        if (password == null) {
+            throw new IllegalArgumentException("Password không được phép mang giá trị null");
+        }
+        if (!password.isBlank()) {
+            this.password = password;
+        }
     }
 
     public void setFullName(String fullName) {
