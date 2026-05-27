@@ -65,7 +65,7 @@ public class AuctionListController implements Initializable {
                 .getAllAuctions()
                 .stream()
                 .filter(a -> a.getEndTime()
-                        .plusDays(1)
+                        .plusDays(3)
                         .isAfter(LocalDateTime.now()))
                 .sorted((a, b) -> b.getStartTime().compareTo(a.getStartTime()))
                 .toList();        if (auctions.isEmpty()) {

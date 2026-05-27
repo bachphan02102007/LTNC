@@ -14,9 +14,9 @@ public class Main {
         Item laptop = ItemFactory.create("ELECTRONICS", "I001",
                 "Laptop Dell", "Core i7", 500.0, "12");
 
-        // Tạo phiên đấu giá kéo dài 5 giây để test
+        // Tạo phiên đấu giá kéo dài 50 giây để test
         Auction auction = new Auction("A001", laptop,
-                LocalDateTime.now().plusSeconds(5));
+                LocalDateTime.now().plusSeconds(50));
 
         // Đăng ký 2 observer — giả lập 2 client đang xem
         auction.addObserver(new ConsoleObserver("Client-Alice"));

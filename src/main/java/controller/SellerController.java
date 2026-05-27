@@ -47,9 +47,9 @@ public class SellerController implements Initializable {
         }
     }
 
-    /**
-     * Gọi từ LoginController sau khi Seller đăng nhập thành công.
-     */
+
+     // Gọi từ LoginController sau khi Seller đăng nhập thành công.
+
     public void initData(Seller seller, SocketClient existingClient) {
         this.currentSeller = seller;
         this.socketClient = existingClient;
@@ -66,7 +66,7 @@ public class SellerController implements Initializable {
         }
     }
 
-    /** Xử lý phản hồi từ server */
+    // Xử lý phản hồi từ server */
     private void handleServerMessage(String message) {
         if (message.startsWith("ADD_ITEM_OK:")) {
             String auctionId = message.split(":")[1];

@@ -10,10 +10,10 @@ package util;
 import model.User;
 import network.SocketClient;
 
-/**
- * Singleton giữ thông tin session hiện tại (user + socket).
- * Thay vì truyền User qua từng màn hình, các Controller lấy từ đây.
- */
+
+ //Singleton giữ thông tin session hiện tại (user + socket).
+ //Thay vì truyền User qua từng màn hình, các Controller lấy từ đây.
+
 public class SessionManager {
 
     private static SessionManager instance;
@@ -32,7 +32,6 @@ public class SessionManager {
 
     public void login(User user) {
         this.currentUser = user;
-        // Tạo SocketClient mới mỗi lần login
         this.socketClient = new SocketClient();
     }
 

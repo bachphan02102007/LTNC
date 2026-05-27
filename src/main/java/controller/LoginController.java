@@ -39,7 +39,6 @@ public class LoginController {
         UserManager.getInstance().authenticate(username, password)
                 .ifPresentOrElse(
                         user -> {
-                            // Lưu user vào session
                             SessionManager.getInstance().login(user);
                             try {
                                 Stage stage = (Stage) usernameField.getScene().getWindow();
@@ -48,7 +47,6 @@ public class LoginController {
                                 } else if (user instanceof Admin) {
                                     goAdmin(stage, (Admin) user);
                                 } else {
-                                    // Bidder/Admin phải connect socket trước khi vào AuctionList
                                     try {
                                         SessionManager.getInstance()
                                                 .getSocketClient()
@@ -95,6 +93,7 @@ public class LoginController {
         stage.setTitle("Quan ly San pham - Seller");
 
         SellerController ctrl = loader.getController();
+        //Truyền thông tin người bán đang đăng nhập và socket client sang màn hình Seller Dashboard.
         ctrl.initData(seller, SessionManager.getInstance().getSocketClient());
 
         stage.show();

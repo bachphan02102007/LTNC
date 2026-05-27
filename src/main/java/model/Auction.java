@@ -59,9 +59,6 @@ public class Auction implements Serializable {
         observers.add(observer);
     }
 
-    public synchronized void removeObserver(AuctionObserver observer) {
-        if (observers != null) observers.remove(observer);
-    }
 
     public void startAuction() {
         lock.lock();
@@ -160,9 +157,9 @@ public class Auction implements Serializable {
     }
 
 
-    /**
-     * Dùng phía client để phục hồi snapshot nhận từ server mà không phát sinh observer/broadcast.
-     */
+
+     //Dùng phía client để phục hồi snapshot nhận từ server mà không phát sinh observer/broadcast.
+
     public void restoreSnapshot(double currentHighestBid, String leaderUsername,
                                 AuctionStatus status, List<BidTransaction> history) {
         lock.lock();
