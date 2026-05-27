@@ -26,6 +26,8 @@ class AuctionTest {
         auction.startAuction();
         alice = new Bidder("U001", "alice", "123");
         bob   = new Bidder("U002", "bob",   "456");
+        alice.setWalletBalance(1000000.0);
+        bob.setWalletBalance(1000000.0);
     }
 
     //Test 1: Đặt giá hợp lệ

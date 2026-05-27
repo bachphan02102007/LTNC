@@ -71,9 +71,9 @@ public class UserManager {
         }, () -> users.add(latest));
     }
 
-    public synchronized void clearUsers() { users.clear(); }
+    public void clearUsers() { users.clear(); }
 
-    public void clearAll() {
-
+    public synchronized void clearAll() {
+        users.clear();
     }
 }

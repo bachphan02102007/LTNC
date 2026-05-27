@@ -137,7 +137,7 @@ class AuctionConcurrencyTest {
         assertEquals(1100, auction.getCurrentHighestBid(), "Lỗi: Race Condition làm mất giá đỉnh dưới tải nặng!");
     }
 
-    // Test 4: Kiểm tra độ ổn định khi Admin đóng phiên đấu giá ĐÚNG VÀO LÚC nhiều người đang ùa vào đặt giá.
+    // Test 4: Kiểm tra độ ổn định khi Admin đóng phiên ĐÚNG LÚC nhiều người đang ùa vào đặt giá
     @Test
     void testBidWhileAuctionClosingConcurrent() throws InterruptedException {
         Item item = new TestItem("ITEM4", "Watch", "Apple Watch", 100);
@@ -149,30 +149,35 @@ class AuctionConcurrencyTest {
         CountDownLatch ready = new CountDownLatch(bidderThreads + 1);
         CountDownLatch start = new CountDownLatch(1);
 
-        // Dùng biến Atomic để đếm an toàn trong môi trường đa luồng
+        // Biến đếm an toàn trong đa luồng
         AtomicInteger closedExceptionCount = new AtomicInteger(0);
         AtomicInteger invalidExceptionCount = new AtomicInteger(0);
         AtomicInteger successBidCount = new AtomicInteger(0);
 
-        // Bước 1: 20 Bidder lăm le đặt giá
+        // 20 Bidder lăm le đặt giá
         for (int i = 0; i < bidderThreads; i++) {
             int price = 200 + i;
             executor.submit(() -> {
                 try {
                     ready.countDown();
                     start.await();
-                    auction.placeBid(new Bidder("B", "bidder", "123"), price);
+
+                    // Nạp tiền để tránh lỗi IllegalArgumentException do ví rỗng
+                    Bidder bidder = new Bidder("B", "bidder", "123");
+                    bidder.setWalletBalance(1000000.0);
+
+                    auction.placeBid(bidder, price);
                     successBidCount.incrementAndGet();
                 } catch (AuctionClosedException e) {
-                    closedExceptionCount.incrementAndGet(); // Bị chặn vì Admin đóng phiên kịp
+                    closedExceptionCount.incrementAndGet(); // Bị chặn do phiên đã đóng
                 } catch (InvalidBidException e) {
-                    invalidExceptionCount.incrementAndGet(); // Đã thêm: Bị chặn vì trễ nhịp giá thấp hơn
+                    invalidExceptionCount.incrementAndGet(); // Bị chặn do giá thấp hơn
                 } catch (Exception ignored) {
                 }
             });
         }
 
-        // Bước 2: 1 Thread đóng vai Admin lăm le ấn nút "Close"
+        // 1 Thread Admin lăm le đóng phiên
         executor.submit(() -> {
             try {
                 ready.countDown();
@@ -181,20 +186,17 @@ class AuctionConcurrencyTest {
             } catch (Exception ignored) {}
         });
 
-        // Bước 3: Kích hoạt hỗn chiến
+        // Kích hoạt tất cả các luồng chạy cùng lúc
         ready.await();
         start.countDown();
 
         executor.shutdown();
         executor.awaitTermination(5, TimeUnit.SECONDS);
 
-        // Bước 4: Kiểm tra tính toàn vẹn (Chống Flaky test)
-        // Tất cả 20 request đấu giá buộc phải nằm ở 1 trong 3 trạng thái:
-        // 1. Thành công | 2. Bị chặn do đóng phiên | 3. Bị chặn do giá thấp hơn
+        // Tổng số luồng hợp lệ phải được bảo toàn, không được thất thoát
         assertEquals(
                 bidderThreads,
                 successBidCount.get() + closedExceptionCount.get() + invalidExceptionCount.get(),
                 "Lỗi: Trạng thái luồng xử lý bị thất thoát khi xảy ra xung đột đóng phiên!"
         );
-    }
-}
+    }}

@@ -205,10 +205,28 @@ public class Auction implements Serializable {
     public String getAuctionId() { return auctionId; }
     public Item getItem() { return item; }
     public LocalDateTime getStartTime() { return startTime; }
-    public double getCurrentHighestBid() { return currentHighestBid; }
-    public Bidder getCurrentLeader() { return currentLeader; }
-    public AuctionStatus getStatus() { return status; }
-    public List<BidTransaction> getBidHistory() { return new ArrayList<>(bidHistory); }
+
+    // Đã bọc khóa để ngăn lỗi mất dữ liệu luồng
+    public double getCurrentHighestBid() {
+        lock.lock();
+        try { return currentHighestBid; } finally { lock.unlock(); }
+    }
+
+    public Bidder getCurrentLeader() {
+        lock.lock();
+        try { return currentLeader; } finally { lock.unlock(); }
+    }
+
+    public AuctionStatus getStatus() {
+        lock.lock();
+        try { return status; } finally { lock.unlock(); }
+    }
+
+    public List<BidTransaction> getBidHistory() {
+        lock.lock();
+        try { return new ArrayList<>(bidHistory); } finally { lock.unlock(); }
+    }
+
     public LocalDateTime getEndTime() { return endTime; }
     public void setEndTime(LocalDateTime t) { this.endTime = t; }
     public String getSellerUsername() { return sellerUsername; }
