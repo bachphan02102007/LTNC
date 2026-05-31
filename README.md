@@ -169,5 +169,5 @@ Các tài khoản Seller/Bidder có thể được tạo qua màn hình đăng k
 > Cập nhật link trước khi nộp chính thức.
 
 - Link báo cáo PDF: `https://drive.google.com/file/d/1QwJnz_mZXvMk438ZgiH6txxlS6TWRIsO/view?usp=sharing`
-- Link video demo: `TODO: dán link video demo tại đây`
+- Link video demo: `https://www.youtube.com/watch?v=t4Z7aAiHAz4`
 

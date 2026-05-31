@@ -1,4 +1,9 @@
-target/
+# Bỏ qua các file build trong target
+target/*
+
+# Nhưng vẫn cho phép đẩy các file .jar trong target
+!target/*.jar
+
 !LTNC/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
