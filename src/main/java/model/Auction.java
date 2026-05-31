@@ -163,9 +163,9 @@ public class Auction implements Serializable {
     }
 
 
-    /**
-     * Dùng phía client để phục hồi snapshot nhận từ server mà không phát sinh observer/broadcast.
-     */
+
+     //Dùng phía client để phục hồi snapshot nhận từ server mà không phát sinh observer/broadcast.
+
     public void restoreSnapshot(double currentHighestBid, String leaderUsername,
                                 AuctionStatus status, List<BidTransaction> history) {
         lock.lock();

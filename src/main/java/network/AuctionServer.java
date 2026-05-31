@@ -79,10 +79,10 @@ public class AuctionServer {
         }
     }
 
-    /**
-     * Broadcast đến tất cả client NGOẠI TRỪ sender.
-     * Dùng cho: GIA_MOI, thông báo join/leave.
-     */
+
+     //Broadcast đến tất cả client NGOẠI TRỪ sender.
+     // Dùng cho: GIA_MOI, thông báo join/leave.
+
     public static void broadcast(String message, ClientHandler sender) {
         for (ClientHandler client : connectedClients) {
             if (client != sender) {
@@ -91,10 +91,10 @@ public class AuctionServer {
         }
     }
 
-    /**
-     * Broadcast đến TẤT CẢ client kể cả người gửi.
-     * Dùng cho: NEW_AUCTION — cả Seller cũng cần cập nhật list.
-     */
+
+     //Broadcast đến TẤT CẢ client kể cả người gửi.
+     // Dùng cho: NEW_AUCTION — cả Seller cũng cần cập nhật list.
+
     public static void broadcastAll(String message) {
         for (ClientHandler client : connectedClients) {
             client.sendMessage(message);

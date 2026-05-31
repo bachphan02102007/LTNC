@@ -32,14 +32,7 @@ import util.SessionManager;
 import util.Singleton.AuctionManager;
 import util.UiDialogs;
 
-/**
- * Màn hình đấu giá realtime hoàn chỉnh:
- *  - Đồng hồ đếm ngược thời gian thực (Timeline JavaFX)
- *  - Bảng lịch sử bid tự cập nhật
- *  - Quick-bid buttons (+100k, +500k, +1tr)
- *  - Popup thông báo kết thúc phiên
- *  - Dùng chung SocketClient từ SessionManager
- */
+
 public class AuctionRoomController implements Initializable {
 
     // ── Header ──
@@ -102,9 +95,9 @@ public class AuctionRoomController implements Initializable {
         buttonBid.setDisable(true);
     }
 
-    /**
-     * Gọi từ AuctionListController khi user chọn vào 1 phiên.
-     */
+
+     // Gọi từ AuctionListController khi user chọn vào 1 phiên.
+
     public void initData(User user, String auctionId) {
         this.currentUser      = user;
         this.currentAuctionId = auctionId;
@@ -266,10 +259,10 @@ public class AuctionRoomController implements Initializable {
         }
     }
 
-    /**
-     * DETAIL_OK:id|name|currentPrice|category|startPrice|endTime|status|seller|sellerPhone|leader|bidder#amount#time;...
-     * Dùng để reload đầy đủ lịch sử từ server khi out ra vào lại phòng.
-     */
+
+     // DETAIL_OK:id|name|currentPrice|category|startPrice|endTime|status|seller|sellerPhone|leader|bidder#amount#time;...
+     //Dùng để reload đầy đủ lịch sử từ server khi out ra vào lại phòng.
+
     private void handleDetailOk(String message) {
         String payload = message.substring("DETAIL_OK:".length());
         String[] p = payload.split("\\|", -1);
@@ -337,10 +330,10 @@ public class AuctionRoomController implements Initializable {
         addLog("✅ Đã trừ ví và thanh toán " + amount + " VNĐ. Liên hệ Seller: " + seller + " - " + phone);
     }
 
-    /**
-     * GIA_MOI:auctionId:amount:bidder
-     * Cập nhật giá + reload lịch sử bid.
-     */
+
+     // GIA_MOI:auctionId:amount:bidder
+     //Cập nhật giá + reload lịch sử bid.
+
     private void handleGiaMoi(String message) {
         String[] parts = message.split(":");
         if (parts.length < 4) return;
@@ -377,7 +370,6 @@ public class AuctionRoomController implements Initializable {
         if (socketClient != null) socketClient.requestDetail(currentAuctionId);
     }
 
-    /** BID_OK:amount */
     private void handleBidOk(String message) {
         double amount = Double.parseDouble(message.split(":")[1]);
         setBidResult("✅ Đặt giá " + String.format("%,.0f VNĐ", amount)
@@ -387,17 +379,14 @@ public class AuctionRoomController implements Initializable {
         if (socketClient != null) socketClient.requestDetail(currentAuctionId);
     }
 
-    /** BID_FAIL:reason */
+
     private void handleBidFail(String message) {
         String reason = message.substring("BID_FAIL:".length());
         setBidResult("❌ " + reason, Color.RED);
         setStatus("❌ Đặt giá thất bại", Color.RED);
     }
 
-    /**
-     * AUCTION_CLOSED:auctionId:winner:finalPrice
-     * Dừng countdown, disable form, hiện popup kết quả.
-     */
+
     private void handleAuctionClosed(String message) {
         String[] parts = message.split(":");
         if (parts.length < 4) return;
@@ -427,10 +416,10 @@ public class AuctionRoomController implements Initializable {
         showResultDialog(winner, finalPrice, iWon, autoPayStatus);
     }
 
-    /**
-     * TIME_EXTENDED:auctionId:newEndTime
-     * Anti-sniping: cập nhật countdown khi phiên được gia hạn.
-     */
+
+     //TIME_EXTENDED:auctionId:newEndTime
+     // Anti-sniping: cập nhật countdown khi phiên được gia hạn.
+
     private void handleTimeExtended(String message) {
         String[] parts = message.split(":", 3);
         if (parts.length < 3) return;
@@ -496,11 +485,9 @@ public class AuctionRoomController implements Initializable {
         }
     }
 
-    /** +100,000 VNĐ so với giá hiện tại */
+    // +xxx VNĐ so với giá hiện tại
     @FXML private void handleQuickBid100()  { quickBid(100_000); }
-    /** +500,000 VNĐ so với giá hiện tại */
     @FXML private void handleQuickBid500()  { quickBid(500_000); }
-    /** +1,000,000 VNĐ so với giá hiện tại */
     @FXML private void handleQuickBid1000() { quickBid(1_000_000); }
 
     private void quickBid(double increment) {
@@ -530,7 +517,7 @@ public class AuctionRoomController implements Initializable {
         }
     }
 
-    /** Gọi từ setOnCloseRequest khi đóng cửa sổ */
+    // Gọi từ setOnCloseRequest khi đóng cửa sổ
     public void onClose() {
         if (countdownTimeline != null) countdownTimeline.stop();
         // Chỉ disconnect nếu không dùng chung SessionManager

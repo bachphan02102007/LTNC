@@ -8,11 +8,7 @@ import java.net.Socket;
 import java.util.function.Consumer;
 import javafx.application.Platform;
 
-/**
- * JavaFX-safe TCP Socket client.
- * Runs 1 background daemon thread to receive server broadcasts.
- * Uses Platform.runLater() to safely update the JavaFX UI thread.
- */
+
 public class SocketClient {
 
     private static final String HOST = "localhost";
@@ -24,10 +20,7 @@ public class SocketClient {
     private volatile Consumer<String> onMessage;
     private volatile boolean running = false;
 
-    /**
-     * Connect to server and register client username.
-     * Starts the background listener thread.
-     */
+
     public void connect(String username, Consumer<String> onMessage) throws IOException {
         connect(username, null, onMessage);
     }
@@ -67,27 +60,24 @@ public class SocketClient {
         t.start();
     }
 
-    /**
-     * Cập nhật callback xử lý message — dùng khi chuyển sang màn hình khác
-     * nhưng vẫn giữ cùng 1 socket connection.
-     * Ví dụ: AuctionList → AuctionRoom đều dùng chung socket,
-     * chỉ cần gọi setOnMessage() để đổi handler.
-     */
+
+     // Cập nhật callback xử lý message — dùng khi chuyển sang màn hình khác
+     //nhưng vẫn giữ cùng 1 socket connection.
+     // Ví dụ: AuctionList → AuctionRoom đều dùng chung socket,
+     // chỉ cần gọi setOnMessage() để đổi handler.
+
     public void setOnMessage(Consumer<String> onMessage) {
         this.onMessage = onMessage;
     }
 
-    /** Send BID command: BID:auctionId:amount */
     public void sendBid(String auctionId, double amount) {
         sendCommand("BID:" + auctionId + ":" + amount);
     }
 
-    /** Request auction list from server */
     public void requestList() {
         sendCommand("LIST");
     }
 
-    /** Seller posts new item: ADD_ITEM:name:startPrice:durationSeconds:category */
     public void sendAddItem(String name, double startPrice, int durationSec, String category) {
         sendCommand("ADD_ITEM:" + name + ":" + startPrice + ":" + durationSec + ":" + category);
     }
@@ -124,14 +114,12 @@ public class SocketClient {
         return value == null ? "" : value.replace(":", " ").trim();
     }
 
-    /** Send raw command (thread-safe). */
     public void sendCommand(String command) {
         if (out != null && socket != null && !socket.isClosed()) {
             out.println(command);
         }
     }
 
-    /** Disconnect and free resources. */
     public void disconnect() {
         running = false;
         try {
